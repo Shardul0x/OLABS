@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, RotateCcw, Award, TrendingUp, Target, Lightbulb, BarChart3, Brain, Eye, MessageCircle, Mic2, ChevronDown, ChevronUp, Cpu, User, Clock, FileText, Tag, Video, MessageSquare, Mic, Shield, AlertTriangle } from "lucide-react";
+import { ArrowLeft, RotateCcw, Award, TrendingUp, Target, Lightbulb, Brain, Eye, MessageCircle, Mic2, ChevronDown, ChevronUp, Cpu, User, Clock, FileText, Tag, Video, MessageSquare, Mic, Shield, AlertTriangle } from "lucide-react";
 import { useHistory, InterviewSession } from "@/contexts/InterviewHistoryContext";
 import { useState } from "react";
 
@@ -39,9 +39,15 @@ const InterviewDetailPage = ({ sessionId, onBack, onNewInterview }: DetailPagePr
     );
   }
 
-  const { scores } = session;
-  const overallGrade = getGrade(session.overallScore);
+  // Fallback safety checks in case Supabase returned incomplete data
+  const scores = session.scores || { clarity: 0, confidence: 0, technical: 0, communication: 0, bodyLanguage: 0, eyeContact: 0 };
+  const overallGrade = getGrade(session.overallScore || 0);
   const date = new Date(session.date);
+  const answersCount = Array.isArray(session.answers) ? session.answers.length : 0;
+  const safeMessages = Array.isArray(session.chatMessages) ? session.chatMessages : [];
+  const safeWarnings = Array.isArray(session.environmentWarnings) ? session.environmentWarnings : [];
+  const safeStrengths = Array.isArray(session.strengths) ? session.strengths : [];
+  const safeImprovements = Array.isArray(session.improvements) ? session.improvements : [];
 
   const coreScores = [
     { label: "Clarity", value: scores.clarity, icon: "💡" },
@@ -104,11 +110,11 @@ const InterviewDetailPage = ({ sessionId, onBack, onNewInterview }: DetailPagePr
               </div>
               <div className="flex flex-wrap gap-3 justify-center md:justify-start text-xs text-muted-foreground">
                 <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{date.toLocaleDateString()} {date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
-                <span className="flex items-center gap-1">{modeIcons[session.mode]} {session.mode} mode</span>
-                <span className="flex items-center gap-1"><Award className="w-3 h-3" /> {session.answers.length} questions</span>
+                <span className="flex items-center gap-1">{modeIcons[session.mode] || <MessageSquare className="w-4 h-4" />} {session.mode || "text"} mode</span>
+                <span className="flex items-center gap-1"><Award className="w-3 h-3" /> {answersCount} questions</span>
               </div>
               <div className="flex flex-wrap gap-1.5 justify-center md:justify-start">
-                {session.topics.map((t) => (
+                {(session.topics || []).map((t) => (
                   <span key={t} className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-secondary border border-border flex items-center gap-1">
                     <Tag className="w-2.5 h-2.5" />{t}
                   </span>
@@ -131,11 +137,11 @@ const InterviewDetailPage = ({ sessionId, onBack, onNewInterview }: DetailPagePr
                   <motion.circle cx="32" cy="32" r="28" fill="none" stroke="hsl(var(--primary))" strokeWidth="4" strokeLinecap="round"
                     strokeDasharray={175.9}
                     initial={{ strokeDashoffset: 175.9 }}
-                    animate={{ strokeDashoffset: 175.9 - (175.9 * item.value) / 100 }}
+                    animate={{ strokeDashoffset: 175.9 - (175.9 * (item.value || 0)) / 100 }}
                     transition={{ duration: 1, delay: 0.3 + i * 0.1 }}
                   />
                 </svg>
-                <span className="absolute inset-0 flex items-center justify-center text-sm font-bold">{item.value}</span>
+                <span className="absolute inset-0 flex items-center justify-center text-sm font-bold">{item.value || 0}</span>
               </div>
               <p className="text-xs font-medium text-muted-foreground">{item.label}</p>
             </motion.div>
@@ -152,12 +158,12 @@ const InterviewDetailPage = ({ sessionId, onBack, onNewInterview }: DetailPagePr
                 <metric.icon className="w-5 h-5 text-white" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{metric.value}%</p>
+                <p className="text-2xl font-bold">{metric.value || 0}%</p>
                 <p className="text-xs text-muted-foreground">{metric.label}</p>
               </div>
               <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
                 <motion.div className={`h-full rounded-full bg-gradient-to-r ${metric.color}`}
-                  initial={{ width: 0 }} animate={{ width: `${metric.value}%` }}
+                  initial={{ width: 0 }} animate={{ width: `${metric.value || 0}%` }}
                   transition={{ duration: 1, delay: 0.4 + i * 0.1 }}
                 />
               </div>
@@ -166,13 +172,13 @@ const InterviewDetailPage = ({ sessionId, onBack, onNewInterview }: DetailPagePr
         </div>
 
         {/* Environment warnings */}
-        {session.environmentWarnings.length > 0 && (
+        {safeWarnings.length > 0 && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
             className="bg-destructive/5 border border-destructive/20 rounded-2xl p-5 space-y-3"
           >
             <h3 className="text-sm font-semibold flex items-center gap-2"><Shield className="w-4 h-4 text-destructive" /> Environment Flags</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {session.environmentWarnings.map((w, i) => (
+              {safeWarnings.map((w, i) => (
                 <div key={i} className="flex items-center gap-2 text-xs bg-destructive/10 rounded-xl px-3 py-2.5">
                   <AlertTriangle className="w-3.5 h-3.5 text-destructive shrink-0" /><span>{w}</span>
                 </div>
@@ -187,11 +193,11 @@ const InterviewDetailPage = ({ sessionId, onBack, onNewInterview }: DetailPagePr
             className="bg-card border border-border rounded-2xl p-5 space-y-3"
           >
             <h3 className="text-sm font-semibold flex items-center gap-2"><TrendingUp className="w-4 h-4 text-green-400" /> Strengths</h3>
-            {session.strengths.length === 0 ? (
+            {safeStrengths.length === 0 ? (
               <p className="text-xs text-muted-foreground">Keep practicing to build strengths!</p>
             ) : (
               <div className="space-y-2">
-                {session.strengths.map((s, i) => (
+                {safeStrengths.map((s, i) => (
                   <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.45 + i * 0.05 }}
                     className="flex items-center gap-2.5 text-xs bg-green-500/5 border border-green-500/10 rounded-xl px-3 py-2.5"
                   >
@@ -205,11 +211,11 @@ const InterviewDetailPage = ({ sessionId, onBack, onNewInterview }: DetailPagePr
             className="bg-card border border-border rounded-2xl p-5 space-y-3"
           >
             <h3 className="text-sm font-semibold flex items-center gap-2"><Target className="w-4 h-4 text-amber-400" /> Areas to Improve</h3>
-            {session.improvements.length === 0 ? (
+            {safeImprovements.length === 0 ? (
               <p className="text-xs text-muted-foreground">Great job across the board!</p>
             ) : (
               <div className="space-y-2">
-                {session.improvements.map((w, i) => (
+                {safeImprovements.map((w, i) => (
                   <motion.div key={i} initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.45 + i * 0.05 }}
                     className="flex items-center gap-2.5 text-xs bg-amber-500/5 border border-amber-500/10 rounded-xl px-3 py-2.5"
                   >
@@ -236,7 +242,7 @@ const InterviewDetailPage = ({ sessionId, onBack, onNewInterview }: DetailPagePr
           </div>
         </motion.div>
 
-        {/* Interview Transcript */}
+        {/* Interview Transcript - WITH DB DATE FIX */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }}
           className="bg-card border border-border rounded-2xl overflow-hidden"
         >
@@ -246,7 +252,7 @@ const InterviewDetailPage = ({ sessionId, onBack, onNewInterview }: DetailPagePr
             <h3 className="text-sm font-semibold flex items-center gap-2">
               <FileText className="w-4 h-4 text-primary" />
               Interview Transcript
-              <span className="text-xs font-normal text-muted-foreground">({session.chatMessages.length} messages)</span>
+              <span className="text-xs font-normal text-muted-foreground">({safeMessages.length} messages)</span>
             </h3>
             {showTranscript ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </button>
@@ -254,33 +260,41 @@ const InterviewDetailPage = ({ sessionId, onBack, onNewInterview }: DetailPagePr
           {showTranscript && (
             <motion.div initial={{ height: 0 }} animate={{ height: "auto" }} className="border-t border-border">
               <div className="max-h-[500px] overflow-y-auto p-5 space-y-3">
-                {session.chatMessages.map((msg) => {
-                  const isAI = msg.role === "ai";
-                  return (
-                    <div key={msg.id} className={`flex gap-2.5 items-start ${isAI ? "" : "flex-row-reverse"}`}>
-                      <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${isAI ? "bg-primary/15" : "bg-secondary"}`}>
-                        {isAI ? <Cpu className="w-3.5 h-3.5 text-primary" /> : <User className="w-3.5 h-3.5" />}
-                      </div>
-                      <div className={`max-w-[80%] space-y-1 ${isAI ? "" : "items-end flex flex-col"}`}>
-                        {isAI && msg.topic && (
-                          <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-primary/10 text-primary">
-                            {msg.topic} {msg.questionIndex !== undefined && `• Q${msg.questionIndex + 1}`}
-                          </span>
-                        )}
-                        <div className={`rounded-xl px-3 py-2 text-xs leading-relaxed ${
-                          isAI ? "bg-secondary/60 rounded-tl-sm" : "bg-primary text-primary-foreground rounded-tr-sm"
-                        }`}>
-                          {msg.content.startsWith("```") ? (
-                            <pre className="font-mono text-[10px] whitespace-pre-wrap">{msg.content.replace(/```\n?/g, "")}</pre>
-                          ) : msg.content}
+                {safeMessages.length === 0 ? (
+                  <p className="text-center text-sm text-muted-foreground py-4">No transcript recorded for this session.</p>
+                ) : (
+                  safeMessages.map((msg) => {
+                    const isAI = msg.role === "ai";
+                    // THE FIX: Always convert the string back to a Date object so it doesn't crash!
+                    const msgTime = new Date(msg.timestamp); 
+                    
+                    return (
+                      <div key={msg.id} className={`flex gap-2.5 items-start ${isAI ? "" : "flex-row-reverse"}`}>
+                        <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${isAI ? "bg-primary/15" : "bg-secondary"}`}>
+                          {isAI ? <Cpu className="w-3.5 h-3.5 text-primary" /> : <User className="w-3.5 h-3.5" />}
                         </div>
-                        <span className="text-[9px] text-muted-foreground">
-                          {msg.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                        </span>
+                        <div className={`max-w-[80%] space-y-1 ${isAI ? "" : "items-end flex flex-col"}`}>
+                          {isAI && msg.topic && (
+                            <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-primary/10 text-primary">
+                              {msg.topic} {msg.questionIndex !== undefined && `• Q${msg.questionIndex + 1}`}
+                            </span>
+                          )}
+                          <div className={`rounded-xl px-3 py-2 text-xs leading-relaxed ${
+                            isAI ? "bg-secondary/60 rounded-tl-sm" : "bg-primary text-primary-foreground rounded-tr-sm"
+                          }`}>
+                            {msg.content?.startsWith("```") ? (
+                              <pre className="font-mono text-[10px] whitespace-pre-wrap">{msg.content.replace(/```\n?/g, "")}</pre>
+                            ) : (msg.content || "")}
+                          </div>
+                          <span className="text-[9px] text-muted-foreground">
+                            {/* Now this will work safely! */}
+                            {msgTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })
+                )}
               </div>
             </motion.div>
           )}
