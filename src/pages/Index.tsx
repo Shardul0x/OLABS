@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { InterviewProvider, useInterview } from "@/contexts/InterviewContext";
 import { HistoryProvider } from "@/contexts/InterviewHistoryContext";
+import { useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
 import LandingPage from "@/pages/LandingPage";
 import SetupPage from "@/pages/SetupPage";
@@ -18,68 +19,71 @@ type AppView = "main" | "history" | "detail" | "profile";
 
 const AppContent = () => {
   const { phase, setPhase } = useInterview();
-  const [loggedIn, setLoggedIn] = useState(false);
+  const { user, isLoading, signOut } = useAuth(); 
   const [view, setView] = useState<AppView>("main");
   const [detailSessionId, setDetailSessionId] = useState<string | null>(null);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
 
+  // Initialize with empty/default
   const [profile, setProfile] = useState<ProfileData>({
-    fullName: "Demo User",
+    fullName: "",
     title: "Software Engineer",
-    email: "demo@hiremind.ai",
-    timezone: "GMT+5:30",
-    workingHours: "9 AM – 6 PM",
+    email: "",
+    experienceLevel: "Mid-Level",
+    targetCompany: "Enterprise",
+    
   });
 
-  if (!loggedIn) {
-    return <LoginPage onLogin={() => setLoggedIn(true)} />;
+  // AUTOMATION LOGIC: This runs the moment the user data is available
+  useEffect(() => {
+    if (user) {
+      setProfile(prev => ({
+        ...prev,
+        fullName: user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || "User",
+        email: user.email || "",
+      }));
+    }
+  }, [user]);
+
+  if (isLoading) {
+    return <div className="min-h-screen flex items-center justify-center bg-background text-muted-foreground">Loading HireMind AI...</div>;
   }
 
-  const handleViewDetail = (id: string) => {
-    setDetailSessionId(id);
-    setView("detail");
-  };
+  if (!user) {
+    return <LoginPage />;
+  }
 
   const handleNewInterview = () => {
     setView("main");
     setPhase("landing");
   };
 
-  // Shared navbar props — defined once, used everywhere
   const navbarProps = {
-    profile: { fullName: profile.fullName, title: profile.title },
+    onGoHome: () => {
+      setView("main");
+      setPhase("landing");
+      setProfileModalOpen(false); 
+    },
+    onViewHistory: () => {
+      setView("history");
+      setProfileModalOpen(false);
+    },
+    onViewProfile: () => {
+      setView("profile");
+      setProfileModalOpen(false);
+    },
     onEditProfile: () => setProfileModalOpen(true),
-    onViewProfile: () => setView("profile"),
-    onViewHistory: () => setView("history"),
-    onLogout: () => setLoggedIn(false),
-    onGoHome: () => { setView("main"); setPhase("landing"); },
+    onLogout: async () => { await signOut(); },
+    profile: profile,
   };
 
   const renderContent = () => {
-    if (view === "history") {
-      return <HistoryPage onViewDetail={handleViewDetail} />;
-    }
-    if (view === "detail" && detailSessionId) {
-      return (
-        <InterviewDetailPage
-          sessionId={detailSessionId}
-          onBack={() => setView("history")}
-          onNewInterview={handleNewInterview}
-        />
-      );
-    }
-    if (view === "profile") {
-      return <ProfilePage />;
-    }
+    if (view === "history") return <HistoryPage onViewDetails={handleViewDetails} onNewInterview={handleNewInterview} />;
+    if (view === "detail" && detailSessionId) return <InterviewDetailPage sessionId={detailSessionId} onBack={() => setView("history")} onNewInterview={handleNewInterview} />;
+    if (view === "profile") return <ProfilePage />;
     return (
       <AnimatePresence mode="wait">
-        <motion.div
-          key={phase}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-        >
+        <motion.div key={phase} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
           {phase === "landing" && <LandingPage />}
           {phase === "setup" && <SetupPage />}
           {phase === "interview" && <InterviewPage />}
@@ -89,19 +93,21 @@ const AppContent = () => {
     );
   };
 
+  const handleViewDetails = (sessionId: string) => {
+    setDetailSessionId(sessionId);
+    setView("detail");
+  };
+
   return (
     <div className="min-h-screen">
       <Navbar {...navbarProps} />
-
       {renderContent()}
-
-      {/* Global Edit Profile Modal — opened from Navbar → ProfileDropdown */}
       <EditProfileModal
         isOpen={profileModalOpen}
         onClose={() => setProfileModalOpen(false)}
         initialData={profile}
-        onSave={(data) => {
-          setProfile(data);
+        onSave={(newData) => {
+          setProfile(newData);
           setProfileModalOpen(false);
         }}
       />

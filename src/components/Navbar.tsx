@@ -5,7 +5,7 @@ import { SwitchMode } from "@/components/ui/switch-mode";
 import ProfileDropdown from "@/components/ProfileDropdown";
 
 interface NavbarProps {
-  profile: { fullName: string; title: string };
+  profile: { fullName: string; title: string; avatarUrl?: string }; // <-- Added avatarUrl here
   onViewProfile: () => void;
   onViewHistory: () => void;
   onLogout: () => void;
@@ -84,6 +84,7 @@ const Navbar = ({ profile, onViewProfile, onViewHistory, onLogout, onGoHome, onE
           <ProfileDropdown
             userName={profile.fullName}
             userTitle={profile.title}
+            avatarUrl={profile.avatarUrl} // <-- Passed down to the dropdown here!
             onEditProfile={onEditProfile}
             onViewProfile={onViewProfile}
             onViewHistory={onViewHistory}

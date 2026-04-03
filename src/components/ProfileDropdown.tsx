@@ -5,6 +5,7 @@ import { useState, useRef, useEffect } from "react";
 interface ProfileDropdownProps {
   userName: string;
   userTitle: string;
+  avatarUrl?: string;
   onEditProfile: () => void;
   onViewProfile: () => void;
   onViewHistory: () => void;
@@ -14,6 +15,7 @@ interface ProfileDropdownProps {
 const ProfileDropdown = ({
   userName,
   userTitle,
+  avatarUrl,
   onEditProfile,
   onViewProfile,
   onViewHistory,
@@ -39,9 +41,15 @@ const ProfileDropdown = ({
         onClick={() => setOpen(!open)}
         className="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-secondary/60 transition-colors"
       >
-        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-          <User className="w-4 h-4 text-primary" />
+        {/* THIS IS THE FIX: The avatar image logic */}
+        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center overflow-hidden border border-border">
+          {avatarUrl ? (
+            <img src={avatarUrl} alt="Profile" className="w-full h-full object-cover" />
+          ) : (
+            <User className="w-4 h-4 text-primary" />
+          )}
         </div>
+        
         <div className="text-left hidden md:block">
           <p className="text-xs font-semibold leading-tight">{userName}</p>
           <p className="text-[10px] text-muted-foreground">{userTitle}</p>
@@ -59,9 +67,18 @@ const ProfileDropdown = ({
             className="absolute right-0 top-full mt-2 w-52 bg-card border border-border rounded-xl shadow-xl overflow-hidden z-50"
           >
             {/* Mini profile header */}
-            <div className="p-3 border-b border-border">
-              <p className="text-sm font-semibold">{userName}</p>
-              <p className="text-xs text-muted-foreground">{userTitle}</p>
+            <div className="p-3 border-b border-border flex items-center gap-3">
+               <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden border border-border shrink-0">
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt="Profile" className="w-full h-full object-cover" />
+                ) : (
+                  <User className="w-5 h-5 text-primary" />
+                )}
+              </div>
+              <div>
+                <p className="text-sm font-semibold truncate max-w-[120px]">{userName}</p>
+                <p className="text-xs text-muted-foreground truncate max-w-[120px]">{userTitle}</p>
+              </div>
             </div>
 
             <div className="p-1">

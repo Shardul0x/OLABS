@@ -5,10 +5,7 @@ import {
   Eye, EyeOff, Zap, Mic, BarChart3, Video,
 } from "lucide-react";
 import { FaGithub, FaGoogle } from "react-icons/fa";
-
-interface LoginPageProps {
-  onLogin: () => void;
-}
+import { supabase } from "@/lib/supabase";
 
 /* ─── Custom cursor glow that follows the mouse ─── */
 const CursorGlow = () => {
@@ -305,7 +302,7 @@ const Field = ({
 };
 
 /* ══════════════════════ MAIN ══════════════════════ */
-const LoginPage = ({ onLogin }: LoginPageProps) => {
+const LoginPage = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail]       = useState("");
   const [password, setPassword] = useState("");
@@ -313,9 +310,33 @@ const LoginPage = ({ onLogin }: LoginPageProps) => {
   const [showPw, setShowPw]     = useState(false);
   const [loading, setLoading]   = useState(false);
 
-  const handleSubmit = () => {
+  // Email login/signup
+  const handleSubmit = async () => {
     setLoading(true);
-    setTimeout(() => { setLoading(false); onLogin(); }, 1500);
+    const authFunction = isSignUp ? supabase.auth.signUp : supabase.auth.signInWithPassword;
+    
+    const { error } = await authFunction({
+      email,
+      password,
+      options: isSignUp ? { data: { full_name: name } } : undefined
+    });
+
+    if (error) {
+      alert(error.message); // Will display any errors (like wrong password)
+    }
+    setLoading(false);
+    // Note: We don't need to route manually. The AuthContext detects the login and automatically swaps the view!
+  };
+
+  // Google & GitHub login
+  const handleOAuthLogin = async (provider: 'github' | 'google') => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: window.location.origin,
+      }
+    });
+    if (error) console.error("OAuth Error:", error.message);
   };
 
   return (
@@ -428,18 +449,23 @@ const LoginPage = ({ onLogin }: LoginPageProps) => {
               transition={{ delay: 0.2 }}
               className="grid grid-cols-2 gap-3 mb-6"
             >
-              {[{ label: "GitHub", Icon: FaGithub }, { label: "Google", Icon: FaGoogle }].map(({ label, Icon }) => (
-                <motion.button
-                  key={label}
-                  whileHover={{ scale: 1.03, boxShadow: "0 0 18px -4px hsl(var(--primary)/0.4)" }}
-                  whileTap={{ scale: 0.96 }}
-                  onClick={onLogin}
-                  className="flex items-center justify-center gap-2 py-3 rounded-xl border border-border bg-secondary/40 transition-colors text-sm font-medium"
-                >
-                  <Icon className="w-4 h-4" />
-                  {label}
-                </motion.button>
-              ))}
+              <motion.button
+                whileHover={{ scale: 1.03, boxShadow: "0 0 18px -4px hsl(var(--primary)/0.4)" }}
+                whileTap={{ scale: 0.96 }}
+                onClick={() => handleOAuthLogin('github')}
+                className="flex items-center justify-center gap-2 py-3 rounded-xl border border-border bg-secondary/40 transition-colors text-sm font-medium"
+              >
+                <FaGithub className="w-4 h-4" /> GitHub
+              </motion.button>
+              
+              <motion.button
+                whileHover={{ scale: 1.03, boxShadow: "0 0 18px -4px hsl(var(--primary)/0.4)" }}
+                whileTap={{ scale: 0.96 }}
+                onClick={() => handleOAuthLogin('google')}
+                className="flex items-center justify-center gap-2 py-3 rounded-xl border border-border bg-secondary/40 transition-colors text-sm font-medium"
+              >
+                <FaGoogle className="w-4 h-4" /> Google
+              </motion.button>
             </motion.div>
 
             {/* Divider */}
