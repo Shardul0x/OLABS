@@ -226,6 +226,6 @@ This project is licensed under the **MIT License**. See [`LICENSE`](./LICENSE) f
 
 <div align="center">
 
-Built by [Shardul Bangale](https://github.com/Shardul0x) · VIIT Pune · 2025
+Built by [Meraki Titatns] · VIIT Pune · 2026
 
 </div>
