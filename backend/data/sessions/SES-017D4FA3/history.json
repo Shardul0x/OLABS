@@ -1,0 +1,128 @@
+[
+  {
+    "question": "Can you walk me through a real-world implementation of your work as an internship AI/ML engineer with Cybrainyx, specifically describing how you incorporated any ML models into an actual solution that impacted the Nagpur Police?",
+    "answer": "CCTV surveillance  mission and predictive policy  develope d and interpreta video or records to solve problem efficiently the action was implemen tation that was described the technical step  that we use the various libraries for  and fws  and fws  and toxicity detection  you DT detection  you DT detection",
+    "analysis": {
+      "clarity": 2,
+      "confidence": 3,
+      "technical": 2,
+      "overall": 2.33
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.2023
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Can you tell me more about the application of the predictive policy you developed and implemented in the CCTV surveillance mission, and how it was used to solve real-world problems.",
+    "answer": "development of adjective policy the highlights interpreting records to solve problem efficiently on technical skill technical side it not the use of various libraries for fws and fws detection like reference to face or feram detection and DT detection likely detection Transformer or decision tree",
+    "analysis": {
+      "clarity": 4,
+      "confidence": 7,
+      "technical": 7,
+      "overall": 6.0
+    },
+    "sentiment": {
+      "tone": "confident",
+      "score": 0.5106
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Can you give an example of how you would implement the Open/Closed principle in a class that has multiple types of payments, such as credit cards and bank transfers?",
+    "answer": "applying open close principle OCP means your coal should be open for extension but close for modification it in the concept context of a payment system you want to be able to add a new payment methods like people or crypt to without changing the existing logic that processes in the payment is the breakdown if I use the single class with if else or switch statements I wallet or CP because every time I had a new payment type I have to modify existing class so the solution is to follow your CP I would define a common surface that all payment type must be implemented applying open close principle OCP means your coal should be open for extension but close for modification it in the concept context of a payment system you want to be able to add a new payment methods like people or crypt to without changing the existing logic that processes in the payment is the breakdown if I use the single class with if else or switch statements I wallet or CP because every time I had a new payment type I have to modify existing class so the solution is to follow your CP I would define a common surface that all payment type must be implemented",
+    "analysis": {
+      "clarity": 6,
+      "confidence": 8,
+      "technical": 4,
+      "overall": 6.0
+    },
+    "sentiment": {
+      "tone": "confident",
+      "score": 0.9341
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "How would you ensure that your design is loosely coupled and highly cohesive given the common surface of payment types you mentioned, to facilitate the addition of new payment methods in the future?",
+    "answer": "I will do it by achieving loose coupling and I shaving high cohension that's it I will do it by achieving loose coupling and I shaving high cohension that's it",
+    "analysis": {
+      "clarity": 2,
+      "confidence": 0,
+      "technical": 2,
+      "overall": 1.33
+    },
+    "sentiment": {
+      "tone": "nervous",
+      "score": -0.5574
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Given a sorted array of unique integers, find all pairs of elements that sum up to a target value. You can use any additional space as needed, but the time complexity should be as efficient as possible. Can you write an algorithm to solve this problem, and describe its time and space complexity?",
+    "answer": "function findPairs(sortedArray, target):\n    left = 0\n    right = length(sortedArray) - 1\n    pairs = []\n\n    while left < right:\n        currentSum = sortedArray[left] + sortedArray[right]\n        \n        if currentSum == target:\n            pairs.add((sortedArray[left], sortedArray[right]))\n            left += 1\n            right -= 1\n        else if currentSum < target:\n            left += 1\n        else:\n            right -= 1\n            \n    return pairs",
+    "analysis": {
+      "clarity": 8,
+      "confidence": 7,
+      "technical": 8,
+      "overall": 7.67
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Here is your DSA interview question:\n\nImplement a function `kthSmallestElement(matrix, k)` that finds the kth smallest element in a sorted matrix where each row is sorted. If k is larger than the total number of elements, return -1. What is the time and space complexity of this function?",
+    "answer": "/**\n * @param {number[][]} matrix\n * @param {number} k\n * @return {number}\n */\nfunction kthSmallestElement(matrix, k) {\n  const rows = matrix.length;\n  if (rows === 0) return -1;\n  const cols = matrix[0].length;\n  \n  // Guard clause for k out of bounds\n  if (k > rows * cols) return -1;\n\n  // Min-heap to store: [value, row_index, col_index]\n  const minHeap = new MinPriorityQueue({ priority: x => x[0] });\n\n  // 1. Push the first element of every row into the heap\n  for (let r = 0; r < Math.min(rows, k); r++) {\n    if (matrix[r].length > 0) {\n      minHeap.enqueue([matrix[r][0], r, 0]);\n    }\n  }\n\n  let count = 0;\n  let result = -1;\n\n  // 2. Extract min k times\n  while (!minHeap.isEmpty() && count < k) {\n    const [val, r, c] = minHeap.dequeue().element;\n    result = val;\n    count++;\n\n    // 3. If there is a next element in the same row, push it\n    if (c + 1 < matrix[r].length) {\n      minHeap.enqueue([matrix[r][c + 1], r, c + 1]);\n    }\n  }\n\n  return result;\n}",
+    "analysis": {
+      "clarity": 8,
+      "confidence": 10,
+      "technical": 8,
+      "overall": 8.67
+    },
+    "sentiment": {
+      "tone": "confident",
+      "score": 0.5562
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  }
+]

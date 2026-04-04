@@ -1,0 +1,107 @@
+[
+  {
+    "question": "How would you design a database schema to track student enrollment and course information if each student is allowed to enroll in at most one course, but a course can have multiple enrolled students?",
+    "answer": "2",
+    "analysis": {
+      "clarity": 0,
+      "confidence": 0,
+      "technical": 0,
+      "overall": 0.0
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0.0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Can you walk me through how you would implement this binary relationship with n:1 cardinality in a real-world project like a university's student management system, and how the database design would impact its performance?",
+    "answer": "asn",
+    "analysis": {
+      "clarity": 0,
+      "confidence": 0,
+      "technical": 0,
+      "overall": 0.0
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0.0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "How would you approach designing a base class and subclass hierarchy to ensure the subclass can override the base class methods without violating the principle of least surprise?",
+    "answer": "ans",
+    "analysis": {
+      "clarity": 1,
+      "confidence": 2,
+      "technical": 0,
+      "overall": 1.0
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0.0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Can you describe a scenario in which you would prefer composition over inheritance to achieve polymorphism in an object-oriented design?",
+    "answer": "asd",
+    "analysis": {
+      "clarity": 0,
+      "confidence": 0,
+      "technical": 0,
+      "overall": 0.0
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0.0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "You're given a directed acyclic graph (DAG) and a node in it, find all the nodes in the DAG that have a path from the given node to any node in a given list of nodes, and the given node cannot be in this list. Assume the adjacency list representation of the DAG is given. What's an efficient solution for this problem? \n\nCan you do this in linear time and O(V) space where V is the number of vertices in the graph?",
+    "answer": "as",
+    "analysis": {
+      "clarity": 4,
+      "confidence": 8,
+      "technical": 5,
+      "overall": 5.67
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0.0,
+      "warnings": [],
+      "final_flags": []
+    }
+  }
+]

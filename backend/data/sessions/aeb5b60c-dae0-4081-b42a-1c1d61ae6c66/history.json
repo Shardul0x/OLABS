@@ -1,0 +1,65 @@
+[
+  {
+    "question": "How would you design a database schema to store information about students who can enroll in multiple courses and courses that can have multiple students, while also allowing you to query student course enrollment history?",
+    "answer": "asd",
+    "analysis": {
+      "clarity": 0,
+      "confidence": 0,
+      "technical": 0,
+      "overall": 0.0
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0.0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "How do you plan to implement and manage the relationships between students and elective courses in a real-world database management system?",
+    "answer": "213",
+    "analysis": {
+      "clarity": 2,
+      "confidence": 2,
+      "technical": 0,
+      "overall": 1.33
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0.0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "How does the use of UDP in DNS handle potential losses of packets?",
+    "answer": "as",
+    "analysis": {
+      "clarity": 0,
+      "confidence": 0,
+      "technical": 0,
+      "overall": 0.0
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0.0,
+      "warnings": [],
+      "final_flags": []
+    }
+  }
+]

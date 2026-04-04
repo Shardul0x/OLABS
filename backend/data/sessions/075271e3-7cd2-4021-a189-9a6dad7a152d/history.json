@@ -1,0 +1,23 @@
+[
+  {
+    "question": "Can you describe the structure of a table in a relational database management system that is used to store projects, including the attributes you would store and why those attributes are necessary in a real-world implementation scenario?",
+    "answer": "no",
+    "analysis": {
+      "clarity": 2,
+      "confidence": 3,
+      "technical": 0,
+      "overall": 1.67
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": -0.296
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 1.0,
+      "warnings": [],
+      "final_flags": []
+    }
+  }
+]

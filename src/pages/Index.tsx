@@ -5,7 +5,6 @@ import { HistoryProvider } from "@/contexts/InterviewHistoryContext";
 import { useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
 import LandingPage from "@/pages/LandingPage";
-import SetupPage from "@/pages/SetupPage";
 import InterviewPage from "@/pages/InterviewPage";
 import ReportPage from "@/pages/ReportPage";
 import LoginPage from "@/pages/LoginPage";
@@ -24,17 +23,14 @@ const AppContent = () => {
   const [detailSessionId, setDetailSessionId] = useState<string | null>(null);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
 
-  // Initialize with empty/default
   const [profile, setProfile] = useState<ProfileData>({
     fullName: "",
     title: "Software Engineer",
     email: "",
     experienceLevel: "Mid-Level",
     targetCompany: "Enterprise",
-    
   });
 
-  // AUTOMATION LOGIC: This runs the moment the user data is available
   useEffect(() => {
     if (user) {
       setProfile(prev => ({
@@ -53,9 +49,15 @@ const AppContent = () => {
     return <LoginPage />;
   }
 
+  // Define these BEFORE renderContent uses them
   const handleNewInterview = () => {
     setView("main");
     setPhase("landing");
+  };
+
+  const handleViewDetails = (sessionId: string) => {
+    setDetailSessionId(sessionId);
+    setView("detail");
   };
 
   const navbarProps = {
@@ -77,36 +79,48 @@ const AppContent = () => {
     profile: profile,
   };
 
+  // 🚀 UNIFIED ANIMATION WRAPPER 🚀
   const renderContent = () => {
-    if (view === "history") return <HistoryPage onViewDetails={handleViewDetails} onNewInterview={handleNewInterview} />;
-    if (view === "detail" && detailSessionId) return <InterviewDetailPage sessionId={detailSessionId} onBack={() => setView("history")} onNewInterview={handleNewInterview} />;
-    if (view === "profile") return <ProfilePage />;
+    // This key tells Framer Motion exactly when to trigger a page transition
+    const currentKey = view === "main" ? phase : view;
+
     return (
       <AnimatePresence mode="wait">
-        <motion.div key={phase} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
-          {phase === "landing" && <LandingPage />}
-          {phase === "setup" && <SetupPage />}
-          {phase === "interview" && <InterviewPage />}
-          {phase === "report" && <ReportPage onViewHistory={() => setView("history")} />}
+        <motion.div
+          key={currentKey}
+          initial={{ opacity: 0, y: 15, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -15, scale: 0.98 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
+          className="w-full flex-1 flex flex-col relative z-10"
+        >
+          {view === "history" && <HistoryPage onViewDetails={handleViewDetails} onNewInterview={handleNewInterview} />}
+          {view === "detail" && detailSessionId && <InterviewDetailPage sessionId={detailSessionId} onBack={() => setView("history")} onNewInterview={handleNewInterview} />}
+          {view === "profile" && <ProfilePage />}
+          
+          {/* SetupPage is gone! LandingPage now handles everything before the interview */}
+          {view === "main" && phase === "landing" && <LandingPage />}
+          {view === "main" && phase === "interview" && <InterviewPage />}
+          {view === "main" && phase === "report" && <ReportPage onViewHistory={() => setView("history")} />}
         </motion.div>
       </AnimatePresence>
     );
   };
 
-  const handleViewDetails = (sessionId: string) => {
-    setDetailSessionId(sessionId);
-    setView("detail");
-  };
-
   return (
-    <div className="min-h-screen">
+    // Added flex-col and overflow-x-hidden to prevent weird scrolling bugs
+    <div className="min-h-screen flex flex-col bg-background overflow-x-hidden relative">
       <Navbar {...navbarProps} />
-      {renderContent()}
+      
+      <main className="flex-1 w-full relative flex flex-col">
+        {renderContent()}
+      </main>
+
       <EditProfileModal
         isOpen={profileModalOpen}
         onClose={() => setProfileModalOpen(false)}
         initialData={profile}
-        onSave={(newData) => {
+        onSave={(newData: ProfileData) => {
           setProfile(newData);
           setProfileModalOpen(false);
         }}

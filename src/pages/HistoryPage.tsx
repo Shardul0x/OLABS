@@ -1,10 +1,13 @@
 import { motion } from "framer-motion";
-import { Clock, Tag, Mic, Video, MessageSquare, Trophy, AlertTriangle, Search, Trash2, ChevronRight } from "lucide-react";
-import { useHistory, InterviewSession } from "@/contexts/InterviewHistoryContext";
+import { Clock, Tag, Mic, Video, MessageSquare, Trophy, Search, Trash2, ChevronRight, Sparkles } from "lucide-react";
+import { useHistory, InterviewSession } from "../contexts/InterviewHistoryContext";
 import { useState } from "react";
+import InterviewDetailPage from "./InterviewDetailPage";
+import CustomCursor from "../components/CustomCursor";
+import AnimatedBackground from "../components/AnimatedBackground"; 
 
 interface HistoryPageProps {
-  onViewDetail: (sessionId: string) => void;
+  onViewDetail?: (sessionId: string) => void;
 }
 
 const modeIcons: Record<string, React.ReactNode> = {
@@ -13,66 +16,102 @@ const modeIcons: Record<string, React.ReactNode> = {
   video: <Video className="w-3.5 h-3.5" />,
 };
 
+const scaleScore = (v: number) => {
+  if (!v || v === 0) return 0;
+  return v <= 10 ? Math.round(v * 10) : Math.round(v);
+};
+
 const getGradeInfo = (score: number) => {
-  if (score >= 90) return { grade: "A+", color: "text-green-400", bg: "bg-green-500/10 border-green-500/20" };
-  if (score >= 80) return { grade: "A", color: "text-green-400", bg: "bg-green-500/10 border-green-500/20" };
-  if (score >= 70) return { grade: "B", color: "text-primary", bg: "bg-primary/10 border-primary/20" };
-  if (score >= 60) return { grade: "C", color: "text-yellow-400", bg: "bg-yellow-500/10 border-yellow-500/20" };
+  const scaled = scaleScore(score);
+  if (scaled >= 90) return { grade: "A+", color: "text-green-400", bg: "bg-green-500/10 border-green-500/20" };
+  if (scaled >= 80) return { grade: "A", color: "text-green-400", bg: "bg-green-500/10 border-green-500/20" };
+  if (scaled >= 70) return { grade: "B", color: "text-primary", bg: "bg-primary/10 border-primary/20" };
+  if (scaled >= 50) return { grade: "C", color: "text-yellow-400", bg: "bg-yellow-500/10 border-yellow-500/20" };
   return { grade: "D", color: "text-destructive", bg: "bg-destructive/10 border-destructive/20" };
 };
 
 const HistoryPage = ({ onViewDetail }: HistoryPageProps) => {
   const { sessions, clearHistory } = useHistory();
   const [search, setSearch] = useState("");
+  const [localSelectedSession, setLocalSelectedSession] = useState<string | null>(null);
 
   const filtered = sessions.filter((s) =>
     s.sessionId.toLowerCase().includes(search.toLowerCase()) ||
     s.topics.some((t) => t.toLowerCase().includes(search.toLowerCase()))
   );
 
+  const handleViewDetail = (sessionId: string) => {
+    if (typeof onViewDetail === 'function') {
+      onViewDetail(sessionId);
+    } else {
+      setLocalSelectedSession(sessionId);
+    }
+  };
+
+  if (localSelectedSession) {
+    return (
+      <InterviewDetailPage 
+        sessionId={localSelectedSession} 
+        onBack={() => setLocalSelectedSession(null)}
+        onNewInterview={() => window.location.href = "/"}
+      />
+    );
+  }
+
   return (
-    <div className="min-h-screen pt-24 pb-12 px-6">
-      <div className="max-w-5xl mx-auto space-y-6">
+    <div className="min-h-screen pt-24 pb-12 px-6 bg-[#020408] cursor-none relative overflow-hidden selection:bg-primary/30">
+      <CustomCursor />
+      
+      {/* 🚀 Live Background Layer */}
+      <div className="fixed inset-0 z-0 pointer-events-none opacity-40">
+        <AnimatedBackground />
+      </div>
+      
+      <div className="max-w-5xl mx-auto space-y-8 relative z-10">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between">
           <div>
-            <h2 className="text-3xl font-bold">Interview History</h2>
-            <p className="text-muted-foreground text-sm mt-1">{sessions.length} session{sessions.length !== 1 ? "s" : ""} recorded</p>
+            <div className="flex items-center gap-2 mb-2">
+               <Sparkles className="w-4 h-4 text-primary animate-pulse" />
+               <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Historical Archive</span>
+            </div>
+            <h2 className="text-4xl font-black text-white tracking-tighter">Interview History</h2>
+            <p className="text-muted-foreground text-sm mt-1 font-medium">{sessions.length} sessions synthesized</p>
           </div>
           {sessions.length > 0 && (
             <motion.button
               whileTap={{ scale: 0.95 }}
               onClick={clearHistory}
-              className="flex items-center gap-2 text-xs text-destructive hover:text-destructive/80 transition-colors px-3 py-2 rounded-lg hover:bg-destructive/5"
+              className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-destructive hover:text-white transition-colors px-4 py-2 rounded-xl hover:bg-destructive/20 border border-transparent hover:border-destructive/30"
             >
               <Trash2 className="w-3.5 h-3.5" /> Clear All
             </motion.button>
           )}
         </motion.div>
 
-        {/* Search */}
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
-          className="relative"
-        >
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="relative">
+          <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground opacity-50" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by session ID or topic..."
-            className="w-full bg-card border border-border rounded-xl pl-11 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
+            placeholder="Search by ID or Technical Domain..."
+            className="w-full bg-card/20 backdrop-blur-xl border border-white/10 rounded-[1.5rem] pl-12 pr-6 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all text-white shadow-2xl"
           />
         </motion.div>
 
-        {/* Sessions */}
         {filtered.length === 0 ? (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-20">
-            <Clock className="w-12 h-12 mx-auto text-muted-foreground/30 mb-4" />
-            <p className="text-muted-foreground">No interviews yet</p>
-            <p className="text-xs text-muted-foreground/60 mt-1">Complete an interview to see it here</p>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-24 bg-card/10 rounded-[3rem] border border-white/5 backdrop-blur-sm">
+            <Clock className="w-16 h-16 mx-auto text-muted-foreground/20 mb-4" />
+            <p className="text-muted-foreground font-bold uppercase tracking-widest text-xs">No records found</p>
           </motion.div>
         ) : (
-          <div className="grid gap-4">
+          <div className="grid gap-5">
             {filtered.map((session, i) => (
-              <SessionCard key={session.sessionId} session={session} index={i} onClick={() => onViewDetail(session.sessionId)} />
+              <SessionCard 
+                key={session.sessionId} 
+                session={session} 
+                index={i} 
+                onClick={() => handleViewDetail(session.sessionId)} 
+              />
             ))}
           </div>
         )}
@@ -82,6 +121,7 @@ const HistoryPage = ({ onViewDetail }: HistoryPageProps) => {
 };
 
 const SessionCard = ({ session, index, onClick }: { session: InterviewSession; index: number; onClick: () => void }) => {
+  const scaledScore = scaleScore(session.overallScore);
   const grade = getGradeInfo(session.overallScore);
   const date = new Date(session.date);
 
@@ -90,55 +130,50 @@ const SessionCard = ({ session, index, onClick }: { session: InterviewSession; i
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.04 }}
-      whileHover={{ scale: 1.005, y: -2 }}
-      whileTap={{ scale: 0.995 }}
+      whileHover={{ scale: 1.01, y: -2, backgroundColor: "rgba(255,255,255,0.03)" }}
+      whileTap={{ scale: 0.99 }}
       onClick={onClick}
-      className="w-full text-left bg-card border border-border rounded-2xl p-5 hover:border-primary/30 transition-all group"
+      className="w-full text-left bg-card/20 backdrop-blur-md border border-white/5 rounded-[2rem] p-6 hover:border-primary/40 transition-all group shadow-xl"
     >
-      <div className="flex items-center gap-4">
-        {/* Grade */}
-        <div className={`w-14 h-14 rounded-xl border ${grade.bg} flex flex-col items-center justify-center shrink-0`}>
-          <span className={`text-xl font-black ${grade.color}`}>{grade.grade}</span>
-          <span className="text-[9px] text-muted-foreground">{session.overallScore}%</span>
+      <div className="flex items-center gap-6">
+        <div className={`w-16 h-16 rounded-2xl border-2 ${grade.bg} flex flex-col items-center justify-center shrink-0 shadow-2xl transition-transform group-hover:scale-110`}>
+          <span className={`text-2xl font-black ${grade.color}`}>{grade.grade}</span>
+          <span className="text-[9px] text-muted-foreground font-black tracking-tighter">{scaledScore}%</span>
         </div>
 
-        {/* Info */}
-        <div className="flex-1 min-w-0 space-y-2">
+        <div className="flex-1 min-w-0 space-y-3">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xs font-mono font-semibold text-primary">{session.sessionId}</span>
-            <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
-              session.status === "completed" ? "bg-green-500/10 text-green-400" : "bg-amber-500/10 text-amber-400"
+            <span className="text-xs font-mono font-bold text-primary/80 tracking-tight">{session.sessionId}</span>
+            <div className={`text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full border ${
+              session.status === "completed" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-amber-500/10 text-amber-400 border-amber-500/20"
             }`}>
-              {session.status === "completed" ? "Completed" : "Aborted"}
-            </span>
+              {session.status === "completed" ? "Completed" : "Incomplete"}
+            </div>
+            {(session as any).final_recommendation && (
+               <span className="text-[9px] px-3 py-1 rounded-full font-black uppercase tracking-[0.2em] bg-primary/10 text-primary border border-primary/20 shadow-inner">
+                 {(session as any).final_recommendation}
+               </span>
+            )}
           </div>
 
-          <div className="flex items-center gap-3 text-xs text-muted-foreground">
-            <span className="flex items-center gap-1">
-              <Clock className="w-3 h-3" />
-              {date.toLocaleDateString()} {date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-            </span>
-            <span className="flex items-center gap-1">
-              {modeIcons[session.mode]}
-              {session.mode}
-            </span>
-            <span className="flex items-center gap-1">
-              <Trophy className="w-3 h-3" />
-              {session.answers.length} Q&A
-            </span>
+          <div className="flex items-center gap-4 text-[11px] text-muted-foreground font-bold uppercase tracking-widest">
+            <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 opacity-50" /> {date.toLocaleDateString()}</span>
+            <span className="flex items-center gap-1.5">{modeIcons[session.mode]} {session.mode}</span>
+            <span className="flex items-center gap-1.5"><Trophy className="w-3.5 h-3.5 text-amber-500/60" /> {session.answers?.length || 0} Interactions</span>
           </div>
 
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-2">
             {session.topics.map((t) => (
-              <span key={t} className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-secondary border border-border flex items-center gap-1">
+              <span key={t} className="text-[9px] font-black uppercase tracking-[0.1em] px-2.5 py-1 rounded-lg bg-white/5 border border-white/5 flex items-center gap-1.5 opacity-60 group-hover:opacity-100 transition-opacity">
                 <Tag className="w-2.5 h-2.5" /> {t}
               </span>
             ))}
           </div>
         </div>
 
-        {/* Arrow */}
-        <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+        <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all group-hover:translate-x-1">
+          <ChevronRight className="w-5 h-5 text-primary" />
+        </div>
       </div>
     </motion.button>
   );

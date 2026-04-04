@@ -1,8 +1,11 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { Upload, FileText, Mic, Video, MessageSquare, ArrowRight, X, Shuffle, Check, Sparkles } from "lucide-react";
+import { Upload, FileText, Mic, Video, MessageSquare, ArrowRight, X, Shuffle, Check, Sparkles, Loader2 } from "lucide-react";
 import { useInterview, InterviewMode, TOPIC_SUBTOPICS } from "@/contexts/InterviewContext";
-import { useRef } from "react";
+import { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom"; // 🔥 Added for navigation
 import { FluidTabs, type TabItem } from "@/components/ui/fluid-tabs";
+import AnimatedBackground from "@/components/AnimatedBackground";
+import ScrollReveal from "@/components/ScrollReveal";
 
 const modeTabs: TabItem[] = [
   { id: "text", label: "Text Mode", icon: <MessageSquare size={20} /> },
@@ -19,15 +22,18 @@ const topicMeta: Record<string, { icon: string; color: string; desc: string }> =
 };
 
 const SetupPage = () => {
+  const navigate = useNavigate(); // 🔥 Hook for URL changes
   const {
-    sessionId, mode, setMode, resumeFile, setResumeFile,
-    additionalFiles, setAdditionalFiles, startSession,
-    selectedTopics, setSelectedTopics,
+    sessionId, setSessionId, mode, setMode, resumeFile, setResumeFile,
+    additionalFiles, setAdditionalFiles, startSession, addChatMessage,
+    selectedTopics, setSelectedTopics, setPhase,
     selectedSubtopics, setSelectedSubtopics,
     randomTopics, setRandomTopics,
   } = useInterview();
+  
   const resumeInputRef = useRef<HTMLInputElement>(null);
   const docInputRef = useRef<HTMLInputElement>(null);
+  const [isStarting, setIsStarting] = useState(false);
 
   const toggleTopic = (topic: string) => {
     if (randomTopics) return;
@@ -58,6 +64,62 @@ const SetupPage = () => {
     }
   };
 
+  const handleStart = async () => {
+    if (!resumeFile) {
+      alert("Please upload your resume to begin.");
+      return;
+    }
+
+    setIsStarting(true);
+
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
+      const formData = new FormData();
+      formData.append("file", resumeFile);
+      formData.append("mode", mode);
+      
+      const userId = localStorage.getItem("user_id") || `user_${Math.floor(Math.random() * 10000)}`;
+      localStorage.setItem("user_id", userId);
+      formData.append("user_id", userId);
+      
+      const response = await fetch(`${apiUrl}/api/start`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || `Backend Error: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      
+      // Update Context States
+      setSessionId(data.session_id);
+      localStorage.setItem("current_session_id", data.session_id);
+
+      // Add the first question to the chat history
+      addChatMessage({
+        id: `msg-ai-first-${Date.now()}`,
+        role: 'ai',
+        content: data.first_question,
+        timestamp: new Date(),
+      });
+
+      // 🔥 THE FIX: Change the URL and Phase to move to the next screen
+      startSession(data.session_id, data.first_question); 
+      setPhase("interview");
+      navigate("/interview");
+
+    } catch (err: any) {
+      console.error("Failed to start session:", err);
+      alert(`Backend Error: ${err.message}`);
+    } finally {
+      setIsStarting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen pt-24 pb-12 px-6">
       <div className="max-w-3xl mx-auto space-y-8">
@@ -65,8 +127,8 @@ const SetupPage = () => {
           <h2 className="text-3xl font-bold mb-2">Session Setup</h2>
           <p className="text-muted-foreground">Configure your interview session</p>
           <div className="mt-3 inline-flex items-center gap-2 bg-secondary px-4 py-2 rounded-full">
-            <span className="text-xs text-muted-foreground">Session ID:</span>
-            <span className="text-xs font-mono font-semibold text-primary">{sessionId}</span>
+            <span className="text-xs text-muted-foreground">User ID:</span>
+            <span className="text-xs font-mono font-semibold text-primary">{localStorage.getItem("user_id") || "Guest"}</span>
           </div>
         </motion.div>
 
@@ -94,28 +156,7 @@ const SetupPage = () => {
           )}
         </motion.div>
 
-        {/* Additional Docs */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
-          className="bg-card border border-border rounded-2xl p-6 space-y-4"
-        >
-          <h3 className="font-semibold flex items-center gap-2"><FileText className="w-4 h-4 text-accent" /> Additional Documents</h3>
-          <input ref={docInputRef} type="file" accept=".pdf" multiple className="hidden" onChange={(e) => {
-            if (e.target.files) setAdditionalFiles([...additionalFiles, ...Array.from(e.target.files)]);
-          }} />
-          {additionalFiles.length > 0 && (
-            <div className="space-y-2">
-              {additionalFiles.map((f, i) => (
-                <div key={i} className="flex items-center justify-between bg-secondary rounded-xl px-4 py-2">
-                  <span className="text-sm truncate">{f.name}</span>
-                  <button onClick={() => setAdditionalFiles(additionalFiles.filter((_, j) => j !== i))} className="text-muted-foreground hover:text-foreground"><X className="w-4 h-4" /></button>
-                </div>
-              ))}
-            </div>
-          )}
-          <button onClick={() => docInputRef.current?.click()} className="text-sm text-primary hover:underline">+ Add files</button>
-        </motion.div>
-
-        {/* Topic Selection - Redesigned */}
+        {/* Topic Selection */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
           className="bg-card border border-border rounded-2xl p-6 space-y-5"
         >
@@ -223,11 +264,21 @@ const SetupPage = () => {
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          onClick={startSession}
-          className="btn-glow w-full flex items-center justify-center gap-3 bg-primary text-primary-foreground py-4 rounded-2xl font-semibold text-lg"
+          onClick={handleStart}
+          disabled={isStarting}
+          className="btn-glow w-full flex items-center justify-center gap-3 bg-primary text-primary-foreground py-4 rounded-2xl font-semibold text-lg disabled:opacity-50"
         >
-          Start Interview
-          <ArrowRight className="w-5 h-5" />
+          {isStarting ? (
+             <>
+               <Loader2 className="w-5 h-5 animate-spin" />
+               Processing Resume...
+             </>
+          ) : (
+             <>
+               Start Interview
+               <ArrowRight className="w-5 h-5" />
+             </>
+          )}
         </motion.button>
       </div>
     </div>

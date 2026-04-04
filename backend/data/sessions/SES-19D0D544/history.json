@@ -1,0 +1,128 @@
+[
+  {
+    "question": "Assuming you worked as an Intern in Cybrainyx, describe a real-world scenario where you used an AI/ML model to solve a significant problem or achieve a desired outcome, and what were the key insights you gained from the project.",
+    "answer": "during my internship I notice that existing rule base security systems are struggling to keep up with zero day fishing attacks traditional filters relied on Blacklist irons but attackers were constantly generating new clean domains that bypass these filters leading to a high rate of successful credential threat I develop the random forest classified to analyse URL features and metada in real time",
+    "analysis": {
+      "clarity": 8,
+      "confidence": 9,
+      "technical": 7,
+      "overall": 8.0
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": -0.4678
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Can you explain how you implemented the real-time analysis of URL features and metadata using Random Forest, and how did you measure the effectiveness of your solution in preventing zero-day phishing attacks?",
+    "answer": "Raina forest is an assemble learning method that uses multiple decision trees where and the forest it is excellent for fishing detection because it handles higher dimensional data well is resistor over fitting and provides feature importance showing which URL characteristics most indicator of a scam real time processing to achieve real time Speed the model is usually as lightweight API",
+    "analysis": {
+      "clarity": 8,
+      "confidence": 10,
+      "technical": 6,
+      "overall": 8.0
+    },
+    "sentiment": {
+      "tone": "confident",
+      "score": 0.5574
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "How would you design a system to handle the retransmission of DNS queries in case of UDP packet loss, considering that UDP does not have built-in error correction mechanisms?",
+    "answer": "transmission over udp requires moving the reliability logic from transport layer for application guaranteed delivery the DNS client risolar must take responsibility for ensuring the query successful",
+    "analysis": {
+      "clarity": 3,
+      "confidence": 6,
+      "technical": 6,
+      "overall": 5.0
+    },
+    "sentiment": {
+      "tone": "confident",
+      "score": 0.7096
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Given the reliability and potential packet loss issues associated with UDP, how would you implement a reliability mechanism for a DNS query in a scenario where the DNS server is sending data over a low-bandwidth network?",
+    "answer": "to implement reliability mechanism for DNS queries over udp in a low bandwid high lost environment the responsibility for insurance successful delivery shift from transport layer to application",
+    "analysis": {
+      "clarity": 6,
+      "confidence": 7,
+      "technical": 8,
+      "overall": 7.0
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.1027
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Here's a coding challenge for you.\n\nGiven a binary tree where each node has a value and a pair of children (left and right), \ndesign an algorithm to check if the tree is a full binary tree (every node has two children or is a leaf node). \nWhat would be your time and space complexity for this problem?",
+    "answer": "function isFullBinarytree(node):\n if node is NULL :\n   return true",
+    "analysis": {
+      "clarity": 2,
+      "confidence": 1,
+      "technical": 8,
+      "overall": 3.67
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.4215
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Implement a function that checks if a given string can be rearranged into a palindrome. The function should return true if the given string can be rearranged into a palindrome and false otherwise. Assume the input string only contains lowercase letters. \nExample: Input: \"aabcc\" Output: True \nTime complexity? Space complexity?",
+    "answer": "so this is my answer so this is my answer",
+    "analysis": {
+      "clarity": 2,
+      "confidence": 1,
+      "technical": 0,
+      "overall": 1.0
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  }
+]

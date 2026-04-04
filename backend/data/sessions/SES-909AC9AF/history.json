@@ -1,0 +1,25 @@
+[
+  {
+    "question": "Can you explain a real-world project where you have successfully integrated Natural Language Processing with your machine learning pipeline and deployed it using APIs like Twilio or OpenAI?",
+    "answer": "I don't know",
+    "analysis": {
+      "clarity": 8,
+      "confidence": 4,
+      "technical": 5,
+      "overall": 5.67
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0
+    },
+    "environment": {
+      "faces_detected": 2,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [
+        "\u26a0\ufe0f Multiple people detected"
+      ],
+      "final_flags": []
+    }
+  }
+]

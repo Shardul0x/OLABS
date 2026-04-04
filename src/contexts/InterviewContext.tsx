@@ -43,23 +43,10 @@ export const TOPIC_SUBTOPICS: Record<string, string[]> = {
   DSA: ["Arrays & Strings", "Trees & Graphs", "Dynamic Programming", "Sorting & Searching", "Linked Lists"],
 };
 
-// 4 Rounds: Computer Basics, DSA, Project/Technical, HR
-const MOCK_QUESTIONS: { text: string; topic: string; type: string; round: string }[] = [
-  // Round 1: Computer Basics
-  { text: "What is the difference between a process and a thread in operating systems?", topic: "OS", type: "theory", round: "Computer Basics" },
-  { text: "Explain TCP/IP three-way handshake and its significance.", topic: "CN", type: "theory", round: "Computer Basics" },
-  { text: "What are the SOLID principles? Give examples of how you've applied them.", topic: "OOP", type: "theory", round: "Computer Basics" },
-  // Round 2: DSA
-  { text: "How would you implement a LRU Cache? Write your approach or code.", topic: "DSA", type: "dsa", round: "DSA" },
-  { text: "Given a binary tree, write code to find the lowest common ancestor of two nodes.", topic: "DSA", type: "dsa", round: "DSA" },
-  // Round 3: Project / Technical
-  { text: "Tell me about your most challenging project. What technologies did you use?", topic: "Project", type: "behavioral", round: "Project & Technical" },
-  { text: "Explain the architecture of a system you've built. How did you handle scalability?", topic: "Project", type: "behavioral", round: "Project & Technical" },
-  // Round 4: HR
-  { text: "How do you handle disagreements with team members during code reviews?", topic: "HR", type: "behavioral", round: "HR" },
-  { text: "Where do you see yourself in 5 years? What motivates you?", topic: "HR", type: "behavioral", round: "HR" },
-  { text: "Describe a time you failed and what you learned from it.", topic: "HR", type: "behavioral", round: "HR" },
-];
+// ─────────────────────────────────────────────────────────────
+// API CONFIG — change BASE_URL to match your backend host/port
+// ─────────────────────────────────────────────────────────────
+const BASE_URL = "http://localhost:8000";
 
 interface InterviewState {
   phase: InterviewPhase;
@@ -72,13 +59,14 @@ interface InterviewState {
   additionalFiles: File[];
   setAdditionalFiles: (f: File[]) => void;
   currentQuestionIndex: number;
+  // questions array is now dynamic: each entry has text + topic derived from backend
   questions: { text: string; topic: string; type: string; round: string }[];
   answers: Answer[];
   addAnswer: (a: Answer) => void;
   nextQuestion: () => void;
   isLoading: boolean;
   setIsLoading: (b: boolean) => void;
-  startSession: () => void;
+  startSession: () => Promise<void>;
   stopSession: () => void;
   cameraOn: boolean;
   setCameraOn: (b: boolean) => void;
@@ -100,9 +88,13 @@ interface InterviewState {
   addEnvironmentWarning: (w: string) => void;
   clearEnvironmentWarnings: () => void;
   interviewActive: boolean;
+  // NEW: submit an answer to the backend and get the next question back
+  submitAnswer: (answer: string) => Promise<void>;
+  // NEW: the LLM report returned when the interview finishes
+  llmReport: Record<string, unknown> | null;
+  // NEW: error message if an API call fails
+  apiError: string | null;
 }
-
-const generateId = () => `SES-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
 
 const InterviewContext = createContext<InterviewState | null>(null);
 
@@ -112,13 +104,50 @@ export const useInterview = () => {
   return ctx;
 };
 
+// ─────────────────────────────────────────────────────────────
+// Helper: derive a rough topic label from question text so the
+// UI badges still work even though the backend doesn't send one.
+// ─────────────────────────────────────────────────────────────
+function guessTopic(text: string): string {
+  const t = text.toLowerCase();
+  if (t.includes("os") || t.includes("process") || t.includes("thread") || t.includes("deadlock") || t.includes("memory") || t.includes("scheduling")) return "OS";
+  if (t.includes("sql") || t.includes("dbms") || t.includes("database") || t.includes("normaliz") || t.includes("transaction")) return "DBMS";
+  if (t.includes("tcp") || t.includes("osi") || t.includes("network") || t.includes("dns") || t.includes("http") || t.includes("routing")) return "CN";
+  if (t.includes("oop") || t.includes("class") || t.includes("inherit") || t.includes("polymorphism") || t.includes("solid") || t.includes("encapsul")) return "OOP";
+  if (t.includes("array") || t.includes("tree") || t.includes("graph") || t.includes("dynamic programming") || t.includes("sorting") || t.includes("linked list") || t.includes("lru") || t.includes("binary")) return "DSA";
+  if (t.includes("project") || t.includes("architect") || t.includes("built") || t.includes("experience") || t.includes("skill")) return "Project";
+  if (t.includes("team") || t.includes("motivat") || t.includes("fail") || t.includes("challenge") || t.includes("years")) return "HR";
+  return "General";
+}
+
+function guessType(text: string): string {
+  const t = text.toLowerCase();
+  if (t.includes("code") || t.includes("implement") || t.includes("write") || t.includes("complexity") || t.includes("algorithm")) return "dsa";
+  if (t.includes("tell me") || t.includes("describe") || t.includes("how do you") || t.includes("where do you")) return "behavioral";
+  return "theory";
+}
+
+function guessRound(topic: string): string {
+  if (topic === "DSA") return "DSA";
+  if (topic === "Project" || topic === "General") return "Project & Technical";
+  if (topic === "HR") return "HR";
+  return "Computer Basics";
+}
+
+// Sentinel value: max questions before we consider the session done.
+// The backend controls the real limit (max_steps = 6 in InterviewController).
+const MAX_QUESTIONS = 6;
+
 export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [phase, setPhase] = useState<InterviewPhase>("landing");
-  const [sessionId] = useState(generateId);
+  // sessionId is now assigned by the backend; empty string until /start-interview responds
+  const [sessionId, setSessionId] = useState("");
   const [mode, setMode] = useState<InterviewMode>("video");
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [additionalFiles, setAdditionalFiles] = useState<File[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  // Dynamic question list — grows as the backend returns new questions
+  const [questions, setQuestions] = useState<{ text: string; topic: string; type: string; round: string }[]>([]);
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [cameraOn, setCameraOn] = useState(true);
@@ -131,6 +160,8 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [environmentWarnings, setEnvironmentWarnings] = useState<string[]>([]);
   const [interviewActive, setInterviewActive] = useState(false);
+  const [llmReport, setLlmReport] = useState<Record<string, unknown> | null>(null);
+  const [apiError, setApiError] = useState<string | null>(null);
 
   const addAnswer = useCallback((a: Answer) => {
     setAnswers((prev) => [...prev, a]);
@@ -152,25 +183,181 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setEnvironmentWarnings([]);
   }, []);
 
-  const startSession = useCallback(() => {
-    setPhase("interview");
-    setCurrentQuestionIndex(0);
-    setAnswers([]);
-    setChatMessages([]);
-    setEnvironmentWarnings([]);
-    setInterviewActive(true);
-    // Add first question as AI message
-    const firstQ = MOCK_QUESTIONS[0];
-    setChatMessages([{
-      id: `msg-${Date.now()}`,
-      role: "ai",
-      content: firstQ.text,
-      timestamp: new Date(),
-      questionIndex: 0,
-      topic: firstQ.topic,
-      questionType: firstQ.type,
-    }]);
-  }, []);
+  // ─────────────────────────────────────────────────────────────
+  // START SESSION  →  POST /start-interview
+  // ─────────────────────────────────────────────────────────────
+  const startSession = useCallback(async () => {
+    if (!resumeFile) {
+      setApiError("Please upload a resume before starting.");
+      return;
+    }
+
+    setIsLoading(true);
+    setApiError(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("resume", resumeFile);
+      additionalFiles.forEach((f) => formData.append("additional_docs", f));
+
+      const res = await fetch(`${BASE_URL}/start-interview`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error(`Server error: ${res.status}`);
+
+      const data: { session_id: string; first_question: string } = await res.json();
+
+      const firstQ = data.first_question;
+      const topic = guessTopic(firstQ);
+      const type = guessType(firstQ);
+      const round = guessRound(topic);
+      const firstEntry = { text: firstQ, topic, type, round };
+
+      setSessionId(data.session_id);
+      setQuestions([firstEntry]);
+      setCurrentQuestionIndex(0);
+      setAnswers([]);
+      setChatMessages([
+        {
+          id: `msg-${Date.now()}`,
+          role: "ai",
+          content: firstQ,
+          timestamp: new Date(),
+          questionIndex: 0,
+          topic,
+          questionType: type,
+        },
+      ]);
+      setEnvironmentWarnings([]);
+      setInterviewActive(true);
+      setPhase("interview");
+    } catch (err) {
+      setApiError(err instanceof Error ? err.message : "Failed to start interview. Is the backend running?");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [resumeFile, additionalFiles]);
+
+  // ─────────────────────────────────────────────────────────────
+  // SUBMIT ANSWER  →  POST /submit-answer
+  // ─────────────────────────────────────────────────────────────
+  const submitAnswer = useCallback(
+    async (answerText: string) => {
+      if (!answerText.trim() || isLoading) return;
+
+      setIsLoading(true);
+      setApiError(null);
+
+      const currentQ = questions[currentQuestionIndex];
+
+      try {
+        const formData = new FormData();
+        formData.append("session_id", sessionId);
+        formData.append("answer", answerText);
+        formData.append("faces_detected", String(facesDetected));
+
+        const res = await fetch(`${BASE_URL}/submit-answer`, {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!res.ok) throw new Error(`Server error: ${res.status}`);
+
+        const data = await res.json();
+
+        // ── Build Answer record from real backend scores ──────────
+        const backendAnalysis = data.analysis ?? {};
+        const backendSentiment = data.sentiment ?? {};
+        const rawTone = (backendSentiment.tone ?? "neutral") as string;
+
+        const sentimentMap: Record<string, "Confident" | "Neutral" | "Nervous"> = {
+          confident: "Confident",
+          neutral: "Neutral",
+          nervous: "Nervous",
+        };
+
+        const clarity = backendAnalysis.clarity ?? 5;
+        const confidence = backendAnalysis.confidence ?? 5;
+        const technical = backendAnalysis.technical ?? 5;
+        const overall = backendAnalysis.overall ?? Math.round((clarity + confidence + technical) / 3);
+
+        const answer: Answer = {
+          questionIndex: currentQuestionIndex,
+          question: currentQ?.text ?? "",
+          topic: currentQ?.topic ?? "General",
+          answer: answerText,
+          facesDetected,
+          scores: {
+            clarity: Math.round(clarity * 10),     // backend gives 0-10, UI shows 0-100
+            confidence: Math.round(confidence * 10),
+            technical: Math.round(technical * 10),
+            overall: Math.round(overall * 10),
+          },
+          analysis: {
+            sentiment: sentimentMap[rawTone] ?? "Neutral",
+            // These are kept as reasonable estimates since backend doesn't send them
+            speakingConfidence: Math.round(confidence * 10),
+            communicationQuality: Math.round(clarity * 10),
+            bodyLanguage: 70,
+            eyeContact: 70,
+            facialConfidence: Math.round(confidence * 10),
+          },
+        };
+
+        addAnswer(answer);
+
+        // ── Environment warnings from backend ─────────────────────
+        const env = data.environment ?? {};
+        (env.warnings ?? []).forEach((w: string) => addEnvironmentWarning(w));
+        (env.final_flags ?? []).forEach((f: string) => addEnvironmentWarning(f));
+
+        // ── Handle next question OR interview complete ─────────────
+        const nextQ = data.next_question;
+
+        // Backend signals completion by returning a tuple-like object
+        // or when next_question is "Interview complete."
+        const isDone =
+          typeof nextQ === "string" && nextQ.toLowerCase().includes("interview complete");
+
+        if (isDone) {
+          // data.next_question in this case is [message, report]
+          // The report is the second element when the backend returns a tuple
+          // In the FastAPI response it comes back as the `report` field inside next_question
+          const report = Array.isArray(nextQ) ? nextQ[1] : (data.report ?? null);
+          if (report) setLlmReport(report);
+
+          nextQuestion(); // push index past the end → triggers isFinished in InterviewPage
+        } else {
+          const nextText = typeof nextQ === "string" ? nextQ : nextQ?.next_question ?? "";
+          const nextTopic = guessTopic(nextText);
+          const nextType = guessType(nextText);
+          const nextRound = guessRound(nextTopic);
+          const nextEntry = { text: nextText, topic: nextTopic, type: nextType, round: nextRound };
+
+          setQuestions((prev) => [...prev, nextEntry]);
+          const nextIdx = currentQuestionIndex + 1;
+          nextQuestion();
+
+          addChatMessage({
+            id: `msg-ai-${Date.now()}`,
+            role: "ai",
+            content: nextText,
+            timestamp: new Date(),
+            questionIndex: nextIdx,
+            topic: nextTopic,
+            questionType: nextType,
+          });
+        }
+      } catch (err) {
+        setApiError(err instanceof Error ? err.message : "Failed to submit answer.");
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [sessionId, isLoading, currentQuestionIndex, questions, facesDetected, addAnswer, addEnvironmentWarning, nextQuestion, addChatMessage]
+  );
 
   const stopSession = useCallback(() => {
     setInterviewActive(false);
@@ -180,11 +367,20 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   return (
     <InterviewContext.Provider
       value={{
-        phase, setPhase, sessionId, mode, setMode,
-        resumeFile, setResumeFile, additionalFiles, setAdditionalFiles,
-        currentQuestionIndex, questions: MOCK_QUESTIONS, answers, addAnswer,
-        nextQuestion, isLoading, setIsLoading, startSession, stopSession,
-        cameraOn, setCameraOn, micOn, setMicOn, isRecording, setIsRecording,
+        phase, setPhase,
+        sessionId,
+        mode, setMode,
+        resumeFile, setResumeFile,
+        additionalFiles, setAdditionalFiles,
+        currentQuestionIndex,
+        questions,
+        answers, addAnswer,
+        nextQuestion,
+        isLoading, setIsLoading,
+        startSession, stopSession,
+        cameraOn, setCameraOn,
+        micOn, setMicOn,
+        isRecording, setIsRecording,
         facesDetected, setFacesDetected,
         selectedTopics, setSelectedTopics,
         selectedSubtopics, setSelectedSubtopics,
@@ -192,6 +388,9 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         chatMessages, addChatMessage,
         environmentWarnings, addEnvironmentWarning, clearEnvironmentWarnings,
         interviewActive,
+        submitAnswer,
+        llmReport,
+        apiError,
       }}
     >
       {children}

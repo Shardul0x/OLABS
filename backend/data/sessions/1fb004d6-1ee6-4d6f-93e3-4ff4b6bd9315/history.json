@@ -1,0 +1,26 @@
+[
+  {
+    "question": "What would you do differently in designing a database schema if the given binary relationship had n:1 cardinality reversed, where every elective course can have multiple students?",
+    "answer": "I am confident in my answer",
+    "analysis": {
+      "clarity": 0,
+      "confidence": 10,
+      "technical": 0,
+      "overall": 3.33
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.4939
+    },
+    "environment": {
+      "faces_detected": 2,
+      "background_voice": true,
+      "voice_level": 0.9,
+      "warnings": [
+        "\u26a0\ufe0f Multiple people detected. Please ensure you are alone.",
+        "\u26a0\ufe0f Background voice detected. Please ensure a quiet environment."
+      ],
+      "final_flags": []
+    }
+  }
+]

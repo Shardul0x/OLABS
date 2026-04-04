@@ -1,0 +1,74 @@
+[
+  {
+    "question": "Describe a real-world project where you applied database normalization techniques to optimize data storage and retrieval.",
+    "answer": "I am confident in my answer",
+    "analysis": {
+      "clarity": 2,
+      "confidence": 8,
+      "technical": 0,
+      "overall": 3.33
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.4939
+    },
+    "environment": {
+      "faces_detected": 2,
+      "background_voice": true,
+      "voice_level": 0.9,
+      "warnings": [
+        "\u26a0\ufe0f Multiple people detected. Please ensure you are alone.",
+        "\u26a0\ufe0f Background voice detected. Please ensure a quiet environment."
+      ],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "How would you implement this database design in a real-world educational institution like Harvard or Stanford University, if you were given a project to design their student enrollment system?",
+    "answer": "I am confident in my answer",
+    "analysis": {
+      "clarity": 2,
+      "confidence": 8,
+      "technical": 0,
+      "overall": 3.33
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.4939
+    },
+    "environment": {
+      "faces_detected": 2,
+      "background_voice": true,
+      "voice_level": 0.9,
+      "warnings": [
+        "\u26a0\ufe0f Multiple people detected. Please ensure you are alone.",
+        "\u26a0\ufe0f Background voice detected. Please ensure a quiet environment."
+      ],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "How would you handle a situation where a high-volume transactional workload requires fast access to a table with a large number of infrequently updated columns while maintaining ACID properties?",
+    "answer": "I am confident in my answer",
+    "analysis": {
+      "clarity": 4,
+      "confidence": 2,
+      "technical": 2,
+      "overall": 2.67
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.4939
+    },
+    "environment": {
+      "faces_detected": 2,
+      "background_voice": true,
+      "voice_level": 0.9,
+      "warnings": [],
+      "final_flags": [
+        "\ud83d\udea8 Repeated multiple-person detection",
+        "\ud83d\udea8 Repeated background voice detected"
+      ]
+    }
+  }
+]

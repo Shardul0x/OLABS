@@ -1,0 +1,65 @@
+[
+  {
+    "question": "Can you describe a situation where you applied your database management skills to manage projects with complex relationships, and how you ensured data consistency in that implementation?",
+    "answer": "asdasd",
+    "analysis": {
+      "clarity": 1,
+      "confidence": 1,
+      "technical": 0,
+      "overall": 0.67
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0.0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Can you describe how this problem would be approached in a real-world scenario, such as when designing a database for a university enrollment system?",
+    "answer": "asdas",
+    "analysis": {
+      "clarity": 0,
+      "confidence": 0,
+      "technical": 0,
+      "overall": 0.0
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0.0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Given that DNS uses UDP and not TCP, can you describe a scenario in which the lack of reliability from UDP might not be a significant issue for a DNS lookup?",
+    "answer": "nn",
+    "analysis": {
+      "clarity": 0,
+      "confidence": 0,
+      "technical": 0,
+      "overall": 0.0
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0.0,
+      "warnings": [],
+      "final_flags": []
+    }
+  }
+]

@@ -1,0 +1,42 @@
+[
+  {
+    "question": "Can you describe how you would implement an enrollment system using a database management system where each student can enroll in one elective course and how you would design the database schema to achieve this?",
+    "answer": "I am confident in my answer",
+    "analysis": {
+      "clarity": 2,
+      "confidence": 8,
+      "technical": 0,
+      "overall": 3.33
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.4939
+    },
+    "environment": {
+      "faces_detected": 1,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Assuming you're confident that the relationship between students and elective courses can be represented with two tables, the Student table with a unique S-Id as the key and the Elective_Course table where each student can enroll in one elective course. How would you handle a situation where a student decides to take a different elective course during the semester and still want to maintain the transactional consistency and database integrity?",
+    "answer": "I am confident in my answer",
+    "analysis": {
+      "clarity": 0,
+      "confidence": 0,
+      "technical": 0,
+      "overall": 0.0
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.4939
+    },
+    "environment": {
+      "faces_detected": 2,
+      "warnings": [
+        "\u26a0\ufe0f Multiple people detected. Please ensure you are alone."
+      ],
+      "final_flags": []
+    }
+  }
+]

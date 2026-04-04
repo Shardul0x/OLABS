@@ -1,0 +1,25 @@
+[
+  {
+    "question": "Can you describe a real-world scenario where you've applied your knowledge of SQL to extract meaningful insights from a large dataset, and what were some of the challenges you faced during the process?",
+    "answer": "I don't know",
+    "analysis": {
+      "clarity": 2,
+      "confidence": 3,
+      "technical": 0,
+      "overall": 1.67
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0
+    },
+    "environment": {
+      "faces_detected": 2,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [
+        "\u26a0\ufe0f Multiple people detected"
+      ],
+      "final_flags": []
+    }
+  }
+]

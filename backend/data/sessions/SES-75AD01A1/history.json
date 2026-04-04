@@ -1,0 +1,128 @@
+[
+  {
+    "question": "Can you explain a real-world scenario where you utilized the concept of a binary relationship with an n:1 cardinality while working on your internship project with Cybrainyx?",
+    "answer": "projector tablet and on relationship while building the modern entry module in this place to entities were target with security and the target silver can tribal multiple results all login sense original from only one server this period when it one relationship  interest",
+    "analysis": {
+      "clarity": 2,
+      "confidence": 2,
+      "technical": 0,
+      "overall": 1.33
+    },
+    "sentiment": {
+      "tone": "confident",
+      "score": 0.7717
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Can you explain how this abstract design for multiple tables and relationships could have been applied in real-world projects involving user authentication and role management, such as building a login system?",
+    "answer": "abstract design of tables relationship is a blueprint of how data structure and how different parts of your application to each other login and roll management system this design translate Charity secure skill level database",
+    "analysis": {
+      "clarity": 4,
+      "confidence": 7,
+      "technical": 7,
+      "overall": 6.0
+    },
+    "sentiment": {
+      "tone": "confident",
+      "score": 0.6369
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Considering that DNS uses UDP for faster response times, what are some potential implications for an application layer protocol like DNS, if it were to switch to using TCP instead of UDP?",
+    "answer": "currently the DNS I want uses DP because it's connectionless this page  that doesn't require hand making fast for response the current",
+    "analysis": {
+      "clarity": 3,
+      "confidence": 2,
+      "technical": 4,
+      "overall": 3.0
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": -0.3244
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Can you walk me through how you would handle a situation where multiple processes are competing for shared resources, and how you would prevent starvation in such a scenario?",
+    "answer": "handling multiple processors complete eating for shared resources the Classic challenge in operating systems and concurrent programming efficiently and prevent starvation and its combination of organisational policy",
+    "analysis": {
+      "clarity": 5,
+      "confidence": 6,
+      "technical": 5,
+      "overall": 5.33
+    },
+    "sentiment": {
+      "tone": "confident",
+      "score": 0.6705
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Implement a function to find the minimum time required to finish all tasks in a circular manner. You are given an integer array task where task[i] represents the time taken to complete the ith task. Return the minimum time required to finish all tasks. You should also find the minimum time at which the tasks can be completed such that the order of completing tasks is not the same as the order in which they were given.\n\nAsk for time and space complexity of your solution.\n\nThe array can contain duplicate task times, but the tasks can be performed in a circular manner. \n\nExample: input [1,2,3] or [5,3,5]",
+    "answer": "```\nfunction getMinimumTime(tasks) {\n    // The minimum time to finish all tasks, regardless of the order or \n    // circular nature, is simply the sum of all task times.\n    let totalTime = 0;\n    \n    for (let i = 0; i < tasks.length; i++) {\n        totalTime += tasks[i];\n    }\n    \n    return totalTime;\n}\n\n// Time Complexity: O(N) where N is the number of tasks in the array.\n// Space Complexity: O(1) since we only use a single variable to store the sum.\n```",
+    "analysis": {
+      "clarity": 6,
+      "confidence": 4,
+      "technical": 7,
+      "overall": 5.67
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0772
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Here's your task: Given an array of integers, find the first duplicate in the array. The integers are between 1 and n where n is the size of the array, and no integer is greater than n. If no duplicate exists return -1. Can you do this in O(n) time and O(1) space complexity, assuming you cannot use any additional data structures?",
+    "answer": "```\nfunction findFirstDuplicate(arr) {\n    for (let i = 0; i < arr.length; i++) {\n        // Get the absolute value to use as an index\n        let val = Math.abs(arr[i]);\n        \n        // If the value at index (val - 1) is already negative,\n        // it means we have seen this number before.\n        if (arr[val - 1] < 0) {\n            return val;\n        }\n        \n        // Otherwise, mark this number as seen by making the \n        // value at index (val - 1) negative.\n        arr[val - 1] = -arr[val - 1];\n    }\n    \n    return -1;\n}\n\n// Time Complexity: O(n) - We iterate through the array only once.\n// Space Complexity: O(1) - We modify the array in-place without using any additional data structures.\n```",
+    "analysis": {
+      "clarity": 8,
+      "confidence": 9,
+      "technical": 9,
+      "overall": 8.67
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": -0.1154
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  }
+]

@@ -1,0 +1,23 @@
+[
+  {
+    "question": "Can you explain how you would represent a binary n:1 relationship between students and their enrolled courses in a relational database schema and provide an example?",
+    "answer": "l",
+    "analysis": {
+      "clarity": 2,
+      "confidence": 1,
+      "technical": 1,
+      "overall": 1.33
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.4588
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0.0,
+      "warnings": [],
+      "final_flags": []
+    }
+  }
+]

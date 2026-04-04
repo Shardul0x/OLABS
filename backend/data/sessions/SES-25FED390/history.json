@@ -1,0 +1,128 @@
+[
+  {
+    "question": "Can you describe a real-world project you've worked on using Machine Learning where you had to apply your skills in data analysis, model selection, and deployment, and how did you measure its performance and success?",
+    "answer": "it is best to use the star method situation as action result be looks a structured example of how you can frame response based on the common project types such as customer prediction the project overview be the goal impact data analysis is connected data analysis future engineering water selection baseline Logistic degradation experiment choice reply me  how much success",
+    "analysis": {
+      "clarity": 6,
+      "confidence": 5,
+      "technical": 8,
+      "overall": 6.33
+    },
+    "sentiment": {
+      "tone": "confident",
+      "score": 0.6705
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Can you provide a real-world project that demonstrates your skills in using Machine Learning models like BNN and Bayesian Random Forest for predicting student performance or grades?",
+    "answer": "bnn bhai Jiyan random forest equally suited for predicting Student of the bise and advantage here is uncertainty quantification by just for student might feel but how confidant the model is in that prediction",
+    "analysis": {
+      "clarity": 4,
+      "confidence": 6,
+      "technical": 6,
+      "overall": 5.33
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": -0.0516
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Consider a database schema where you have a table for students and another for their respective exam scores. If a student has multiple exam scores under the same subject, how would you design the database to ensure referential integrity and prevent data redundancy.",
+    "answer": "to design a database that efficiently handled students and their exams schools while enjoying a refriential integrity and preventing data density you should follow the principal of normalization based on this is a student can have multiples good for the same subject here is how you should structure the schema first above structure  primary key primary key for LG second insurance  3rd preventing data at",
+    "analysis": {
+      "clarity": 6,
+      "confidence": 4,
+      "technical": 4,
+      "overall": 4.67
+    },
+    "sentiment": {
+      "tone": "confident",
+      "score": 0.886
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Suppose we're designing a database for an e-commerce platform with multiple warehouses, each storing a large quantity of products. How would you handle data consistency and redundancy across these warehouses while ensuring that transactions involving inventory updates are atomic and durable?",
+    "answer": "designing and database for a Commerce platform multiple warehouse involve balancing data consistency performance and system in liability",
+    "analysis": {
+      "clarity": 8,
+      "confidence": 6,
+      "technical": 7,
+      "overall": 7.0
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": -0.2023
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "You're given a sorted array of integers where each number appears three or fewer times. Write a function that finds the first duplicate in the array, or returns -1 if no duplicates exist. \n\nThe function should take as input the array and return the first duplicate found. Note that there may be zero, one, or multiple duplicates. \n\nCan you implement this function? \n\nCan you estimate the time and space complexity of your solution?",
+    "answer": "```\nfunction findfirstduplicate(arr):\n for i from 0 to length(arr) -2 :\n   if arr[i]== arr[i+1]:\n      return arr[i]\n\n return -1\n```",
+    "analysis": {
+      "clarity": 6,
+      "confidence": 4,
+      "technical": 5,
+      "overall": 5.0
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Implement a function that takes a string of parentheses as input and returns true if the parentheses are balanced, meaning every open parenthesis has a corresponding close parenthesis that comes after it, and false otherwise. For example, the string \"(())\" is balanced, but the string \"(()\" is not balanced.\n\nWhat is the time and space complexity of your solution?",
+    "answer": "```\nFUNCTION isBalanced(string):\n   counter = 0\n   FOR EACH char IN string:\n       IF char == '(':\n            counter = counter + 1\n       ELSE IF char == ')':\n            counter = counter - 1\n       IF counter < 0:\n            RETURN false\n    RETURN counter == 0\n```",
+    "analysis": {
+      "clarity": 8,
+      "confidence": 9,
+      "technical": 7,
+      "overall": 8.0
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  }
+]

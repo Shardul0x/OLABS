@@ -1,0 +1,65 @@
+[
+  {
+    "question": "Describe a scenario where database normalization could potentially cause issues in real-world projects, and how you would address those issues.",
+    "answer": "32",
+    "analysis": {
+      "clarity": 4,
+      "confidence": 6,
+      "technical": 0,
+      "overall": 3.33
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0.0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "How do you envision designing a database schema to store course enrollment data for multiple semesters?",
+    "answer": "abc",
+    "analysis": {
+      "clarity": 2,
+      "confidence": 1,
+      "technical": 1,
+      "overall": 1.33
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0.0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Based on your previous answer about why DNS uses UDP, how would you design a scenario in which a DNS request is retried if the initial UDP request timed out, but the client still requires a reliable response within a certain time limit?",
+    "answer": "2",
+    "analysis": {
+      "clarity": 2,
+      "confidence": 1,
+      "technical": 0,
+      "overall": 1.0
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0.0,
+      "warnings": [],
+      "final_flags": []
+    }
+  }
+]

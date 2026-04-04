@@ -1,0 +1,23 @@
+[
+  {
+    "question": "Can you describe how you would represent the relationship between students and their elective courses in a database management system?",
+    "answer": "l",
+    "analysis": {
+      "clarity": 0,
+      "confidence": 0,
+      "technical": 0,
+      "overall": 0.0
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.4588
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0.0,
+      "warnings": [],
+      "final_flags": []
+    }
+  }
+]

@@ -1,316 +1,310 @@
-import { motion } from "framer-motion";
-import { ArrowLeft, RotateCcw, Award, TrendingUp, Target, Lightbulb, Brain, Eye, MessageCircle, Mic2, ChevronDown, ChevronUp, Cpu, User, Clock, FileText, Tag, Video, MessageSquare, Mic, Shield, AlertTriangle } from "lucide-react";
-import { useHistory, InterviewSession } from "@/contexts/InterviewHistoryContext";
-import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  ArrowLeft, RotateCcw, Award, TrendingUp, Target, 
+  MessageCircle, ChevronDown, ChevronUp, Cpu, 
+  User, Clock, FileText, Tag, CheckCircle2, 
+  XCircle, Sparkles, ThumbsUp, AlertCircle, Layers
+} from "lucide-react";
+import { useHistory } from "../contexts/InterviewHistoryContext";
+import { useState, useEffect } from "react";
+
+// --- INLINED COMPONENTS TO PREVENT IMPORT ERRORS ---
+
+const CustomCursor = () => {
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => setMousePos({ x: e.clientX, y: e.clientY });
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
+  return (
+    <div className="hidden lg:block pointer-events-none fixed inset-0 z-[9999]">
+      <motion.div className="w-1.5 h-1.5 bg-primary rounded-full fixed top-0 left-0" style={{ x: mousePos.x - 3, y: mousePos.y - 3 }} />
+      <motion.div className="w-8 h-8 border border-primary/30 rounded-full fixed top-0 left-0 transition-transform duration-100 ease-out" style={{ x: mousePos.x - 16, y: mousePos.y - 16 }} />
+    </div>
+  );
+};
+
+const AnimatedBackground = () => (
+  <div className="absolute inset-0 overflow-hidden pointer-events-none">
+    <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary/10 blur-[120px]" />
+    <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-blue-600/10 blur-[120px]" />
+  </div>
+);
+
+// --- MAIN PAGE COMPONENT ---
 
 interface DetailPageProps {
   sessionId: string;
-  onBack: () => void;
-  onNewInterview: () => void;
+  onBack?: () => void;
+  onNewInterview?: () => void;
 }
 
-const getGrade = (score: number) => {
-  if (score >= 90) return { grade: "A+", color: "text-green-400", bg: "bg-green-500/10 border-green-500/20" };
-  if (score >= 80) return { grade: "A", color: "text-green-400", bg: "bg-green-500/10 border-green-500/20" };
-  if (score >= 70) return { grade: "B", color: "text-primary", bg: "bg-primary/10 border-primary/20" };
-  if (score >= 60) return { grade: "C", color: "text-yellow-400", bg: "bg-yellow-500/10 border-yellow-500/20" };
-  return { grade: "D", color: "text-destructive", bg: "bg-destructive/10 border-destructive/20" };
+// ⚡ Scale helper: Standardizes LLM scores (e.g. 5 becomes 50%, 75 stays 75%)
+const scale = (v: number) => {
+  if (!v || v === 0) return 0;
+  return v <= 10 ? Math.round(v * 10) : Math.round(v);
 };
 
-const modeIcons: Record<string, React.ReactNode> = {
-  text: <MessageSquare className="w-4 h-4" />,
-  voice: <Mic className="w-4 h-4" />,
-  video: <Video className="w-4 h-4" />,
+const getGrade = (score: number) => {
+  const scaled = scale(score);
+  if (scaled >= 90) return { grade: "A+", color: "text-green-400", bg: "bg-green-500/10 border-green-500/20 shadow-green-500/20" };
+  if (scaled >= 80) return { grade: "A", color: "text-green-400", bg: "bg-green-500/10 border-green-500/20 shadow-green-500/20" };
+  if (scaled >= 70) return { grade: "B", color: "text-primary", bg: "bg-primary/10 border-primary/20 shadow-primary/20" };
+  if (scaled >= 50) return { grade: "C", color: "text-yellow-400", bg: "bg-yellow-500/10 border-yellow-500/20 shadow-yellow-500/20" };
+  return { grade: "D", color: "text-destructive", bg: "bg-destructive/10 border-destructive/20 shadow-destructive/20" };
 };
 
 const InterviewDetailPage = ({ sessionId, onBack, onNewInterview }: DetailPageProps) => {
   const { getSession } = useHistory();
-  const session = getSession(sessionId);
-  const [showTranscript, setShowTranscript] = useState(false);
+  const session = getSession(sessionId) as any;
+  const [showTranscript, setShowTranscript] = useState(true);
 
   if (!session) {
     return (
-      <div className="min-h-screen pt-24 pb-12 px-6 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-[#020408]">
         <div className="text-center space-y-4">
-          <p className="text-muted-foreground">Session not found</p>
-          <button onClick={onBack} className="text-primary hover:underline text-sm">Go back</button>
+          <XCircle className="w-16 h-16 text-destructive mx-auto opacity-20" />
+          <p className="text-muted-foreground font-medium">Data processing. Please return shortly.</p>
+          <button onClick={onBack} className="text-primary font-bold uppercase tracking-widest text-xs hover:underline">Back to Archive</button>
         </div>
       </div>
     );
   }
 
-  // Fallback safety checks in case Supabase returned incomplete data
-  const scores = session.scores || { clarity: 0, confidence: 0, technical: 0, communication: 0, bodyLanguage: 0, eyeContact: 0 };
+  // Extract Groq LLM Data safely
+  const scores = session.scores || { clarity: 0, confidence: 0, technical: 0 };
   const overallGrade = getGrade(session.overallScore || 0);
-  const date = new Date(session.date);
-  const answersCount = Array.isArray(session.answers) ? session.answers.length : 0;
+  const recommendation = session.final_recommendation || "Consider"; 
+  const aiCommunication = session.feedback || session.communication || "Neural engine finalizing report..."; 
   const safeMessages = Array.isArray(session.chatMessages) ? session.chatMessages : [];
-  const safeWarnings = Array.isArray(session.environmentWarnings) ? session.environmentWarnings : [];
-  const safeStrengths = Array.isArray(session.strengths) ? session.strengths : [];
-  const safeImprovements = Array.isArray(session.improvements) ? session.improvements : [];
-
-  const coreScores = [
-    { label: "Clarity", value: scores.clarity, icon: "💡" },
-    { label: "Confidence", value: scores.confidence, icon: "💪" },
-    { label: "Technical", value: scores.technical, icon: "⚡" },
-  ];
-
-  const detailedMetrics = [
-    { label: "Speaking Confidence", value: scores.confidence, icon: Mic2, color: "from-blue-500 to-cyan-400" },
-    { label: "Communication", value: scores.communication, icon: MessageCircle, color: "from-violet-500 to-purple-400" },
-    { label: "Body Language", value: scores.bodyLanguage, icon: Brain, color: "from-emerald-500 to-green-400" },
-    { label: "Eye Contact", value: scores.eyeContact, icon: Eye, color: "from-amber-500 to-orange-400" },
-  ];
-
-  const suggestions = [
-    "Practice with a timer to improve conciseness",
-    "Use the STAR method for behavioral questions",
-    "Record yourself to review body language",
-    "Study system design patterns for senior roles",
-    "Prepare 2-3 stories that showcase leadership",
-  ];
+  
+  const strengths = Array.isArray(session.strengths) ? session.strengths : [];
+  const improvements = Array.isArray(session.improvements) ? session.improvements : [];
+  const topicFeedback = session.topic_feedback || {};
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-6">
-      <div className="max-w-6xl mx-auto space-y-6">
-        {/* Back button */}
+    <div className="min-h-screen pt-24 pb-12 px-6 bg-[#020408] cursor-none relative overflow-hidden selection:bg-primary/40">
+      {/* Visual Enhancement Layer */}
+      <CustomCursor />
+      <div className="fixed inset-0 z-0 pointer-events-none opacity-40">
+        <AnimatedBackground />
+      </div>
+
+      <div className="max-w-6xl mx-auto space-y-10 relative z-10">
         <motion.button
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
-          whileTap={{ scale: 0.95 }}
+          initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
           onClick={onBack}
-          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground hover:text-white transition-colors group bg-white/5 px-4 py-2 rounded-full border border-white/10 w-fit"
         >
-          <ArrowLeft className="w-4 h-4" /> Back to History
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> 
+          Archive Overview
         </motion.button>
 
-        {/* Hero */}
+        {/* Hero Section */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-          className="relative overflow-hidden rounded-3xl bg-card border border-border p-8 md:p-12"
+          className="relative overflow-hidden rounded-[3rem] bg-card/20 backdrop-blur-3xl border border-white/10 p-10 md:p-14 shadow-2xl"
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
-          <div className="relative flex flex-col md:flex-row items-center gap-8">
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
-              className={`w-36 h-36 rounded-3xl border-2 ${overallGrade.bg} flex flex-col items-center justify-center shrink-0`}
-            >
-              <span className={`text-5xl font-black ${overallGrade.color}`}>{overallGrade.grade}</span>
-              <span className="text-xs text-muted-foreground mt-1">Overall Grade</span>
-            </motion.div>
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/5 pointer-events-none" />
+          <div className="relative flex flex-col md:flex-row items-center gap-12">
+            <div className={`w-40 h-40 rounded-[2.5rem] border-2 shadow-[0_0_60px_-15px_rgba(0,0,0,0.5)] ${overallGrade.bg} flex flex-col items-center justify-center shrink-0 transition-transform hover:scale-105 duration-500`}>
+              <span className={`text-6xl font-black tracking-tighter ${overallGrade.color}`}>{overallGrade.grade}</span>
+              <span className="text-[9px] uppercase font-black tracking-[0.3em] text-muted-foreground mt-2">Proficiency</span>
+            </div>
 
-            <div className="flex-1 text-center md:text-left space-y-3">
-              <h2 className="text-3xl md:text-4xl font-bold">Interview Report</h2>
-              <div className="flex flex-wrap gap-2 items-center justify-center md:justify-start">
-                <span className="text-xs font-mono font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full">{session.sessionId}</span>
-                <span className={`text-xs px-3 py-1 rounded-full font-medium ${
-                  session.status === "completed" ? "bg-green-500/10 text-green-400" : "bg-amber-500/10 text-amber-400"
-                }`}>{session.status}</span>
+            <div className="flex-1 text-center md:text-left space-y-6">
+              <div>
+                <div className="flex items-center justify-center md:justify-start gap-2 mb-3">
+                   <Sparkles className="w-4 h-4 text-primary" />
+                   <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em]">Synthesis Complete</span>
+                </div>
+                <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-white leading-none">Session Intelligence</h2>
               </div>
-              <div className="flex flex-wrap gap-3 justify-center md:justify-start text-xs text-muted-foreground">
-                <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{date.toLocaleDateString()} {date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
-                <span className="flex items-center gap-1">{modeIcons[session.mode] || <MessageSquare className="w-4 h-4" />} {session.mode || "text"} mode</span>
-                <span className="flex items-center gap-1"><Award className="w-3 h-3" /> {answersCount} questions</span>
+              
+              <div className="flex flex-wrap gap-3 justify-center md:justify-start">
+                <span className="text-[9px] font-mono bg-white/5 border border-white/10 px-4 py-1.5 rounded-full text-muted-foreground flex items-center shadow-inner">{session.sessionId}</span>
+                <span className={`text-[9px] font-black uppercase tracking-[0.2em] px-5 py-1.5 rounded-full border shadow-lg flex items-center gap-2 ${
+                  recommendation.includes("Strong") ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-emerald-500/10" :
+                  recommendation.includes("Reject") ? "bg-red-500/10 text-red-400 border-red-500/20 shadow-red-500/10" :
+                  "bg-primary/10 text-primary border-primary/20 shadow-primary/10"
+                }`}>
+                  <Target className="w-3 h-3" /> Verdict: {recommendation}
+                </span>
               </div>
-              <div className="flex flex-wrap gap-1.5 justify-center md:justify-start">
-                {(session.topics || []).map((t) => (
-                  <span key={t} className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-secondary border border-border flex items-center gap-1">
-                    <Tag className="w-2.5 h-2.5" />{t}
-                  </span>
-                ))}
+              
+              <div className="flex items-center gap-8 justify-center md:justify-start text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">
+                <span className="flex items-center gap-2"><Clock className="w-4 h-4 text-primary/40" /> {new Date(session.date).toLocaleDateString()}</span>
+                <span className="flex items-center gap-2"><Award className="w-4 h-4 text-primary/40" /> {safeMessages.length} Records</span>
               </div>
             </div>
           </div>
         </motion.div>
 
-        {/* Core Scores */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {coreScores.map((item, i) => (
-            <motion.div key={item.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 + i * 0.05 }}
-              className="bg-card border border-border rounded-2xl p-5 text-center space-y-3"
-            >
-              <div className="text-2xl">{item.icon}</div>
-              <div className="relative mx-auto w-16 h-16">
-                <svg className="w-16 h-16 -rotate-90" viewBox="0 0 64 64">
-                  <circle cx="32" cy="32" r="28" fill="none" stroke="hsl(var(--secondary))" strokeWidth="4" />
-                  <motion.circle cx="32" cy="32" r="28" fill="none" stroke="hsl(var(--primary))" strokeWidth="4" strokeLinecap="round"
-                    strokeDasharray={175.9}
-                    initial={{ strokeDashoffset: 175.9 }}
-                    animate={{ strokeDashoffset: 175.9 - (175.9 * (item.value || 0)) / 100 }}
-                    transition={{ duration: 1, delay: 0.3 + i * 0.1 }}
-                  />
-                </svg>
-                <span className="absolute inset-0 flex items-center justify-center text-sm font-bold">{item.value || 0}</span>
-              </div>
-              <p className="text-xs font-medium text-muted-foreground">{item.label}</p>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Detailed Metrics */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {detailedMetrics.map((metric, i) => (
-            <motion.div key={metric.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 + i * 0.05 }}
-              className="bg-card border border-border rounded-2xl p-4 space-y-3"
-            >
-              <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${metric.color} flex items-center justify-center`}>
-                <metric.icon className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{metric.value || 0}%</p>
-                <p className="text-xs text-muted-foreground">{metric.label}</p>
-              </div>
-              <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
-                <motion.div className={`h-full rounded-full bg-gradient-to-r ${metric.color}`}
-                  initial={{ width: 0 }} animate={{ width: `${metric.value || 0}%` }}
-                  transition={{ duration: 1, delay: 0.4 + i * 0.1 }}
-                />
-              </div>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Environment warnings */}
-        {safeWarnings.length > 0 && (
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
-            className="bg-destructive/5 border border-destructive/20 rounded-2xl p-5 space-y-3"
+        {/* Communication DNA */}
+        {aiCommunication && aiCommunication !== "Incomplete" && (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+            className="bg-card/20 backdrop-blur-2xl border border-white/5 rounded-[2.5rem] p-10 space-y-5 shadow-2xl relative overflow-hidden group"
           >
-            <h3 className="text-sm font-semibold flex items-center gap-2"><Shield className="w-4 h-4 text-destructive" /> Environment Flags</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {safeWarnings.map((w, i) => (
-                <div key={i} className="flex items-center gap-2 text-xs bg-destructive/10 rounded-xl px-3 py-2.5">
-                  <AlertTriangle className="w-3.5 h-3.5 text-destructive shrink-0" /><span>{w}</span>
+            <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity">
+               <MessageCircle size={100} className="text-primary" />
+            </div>
+            <div className="flex items-center gap-3 text-primary">
+              <MessageCircle className="w-6 h-6" />
+              <h3 className="text-xl font-black tracking-tight uppercase">Communication DNA</h3>
+            </div>
+            <p className="text-muted-foreground leading-relaxed text-lg font-medium italic relative z-10">
+              "{aiCommunication}"
+            </p>
+          </motion.div>
+        )}
+
+        {/* Metrics Matrix */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          {[
+            { label: "Answer Clarity", val: scale(scores.clarity), icon: "💡", color: "text-blue-400" },
+            { label: "Vocal Presence", val: scale(scores.confidence), icon: "💪", color: "text-violet-400" },
+            { label: "Technical Logic", val: scale(scores.technical), icon: "⚡", color: "text-amber-400" }
+          ].map((item, idx) => (
+            <motion.div key={item.label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 + idx * 0.1 }}
+              className="bg-card/20 backdrop-blur-md border border-white/5 rounded-[2.5rem] p-8 text-center space-y-6 hover:border-white/20 transition-all shadow-xl"
+            >
+              <div className="text-3xl filter drop-shadow-lg">{item.icon}</div>
+              <div className={`text-4xl font-black tracking-tighter ${item.color}`}>{item.val}%</div>
+              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.3em]">{item.label}</p>
+              <div className="h-1.5 bg-white/5 rounded-full overflow-hidden border border-white/5 p-0.5 shadow-inner">
+                <motion.div initial={{ width: 0 }} animate={{ width: `${item.val}%` }} className={`h-full rounded-full ${item.color.replace('text-', 'bg-')} shadow-[0_0_15px_rgba(255,255,255,0.1)]`} />
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Insights & Pro Tips (Strengths & Improvements) */}
+        {(strengths.length > 0 || improvements.length > 0) && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {strengths.length > 0 && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+                className="bg-card/20 backdrop-blur-md border border-white/5 rounded-[2.5rem] p-8 shadow-xl flex flex-col"
+              >
+                <h3 className="text-lg font-black text-emerald-400 mb-6 flex items-center gap-3 uppercase tracking-widest">
+                  <ThumbsUp className="w-5 h-5" /> Key Strengths
+                </h3>
+                <ul className="space-y-4 flex-1">
+                  {strengths.map((s: string, i: number) => (
+                    <li key={i} className="flex items-start gap-4 text-sm text-white/80 font-medium">
+                      <div className="bg-emerald-500/20 p-1.5 rounded-full shrink-0 mt-0.5">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                      </div>
+                      <span className="leading-relaxed pt-0.5">{s}</span>
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            )}
+
+            {improvements.length > 0 && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
+                className="bg-card/20 backdrop-blur-md border border-white/5 rounded-[2.5rem] p-8 shadow-xl flex flex-col"
+              >
+                <h3 className="text-lg font-black text-amber-400 mb-6 flex items-center gap-3 uppercase tracking-widest">
+                  <TrendingUp className="w-5 h-5" /> Areas to Grow
+                </h3>
+                <ul className="space-y-4 flex-1">
+                  {improvements.map((s: string, i: number) => (
+                    <li key={i} className="flex items-start gap-4 text-sm text-white/80 font-medium">
+                      <div className="bg-amber-500/20 p-1.5 rounded-full shrink-0 mt-0.5">
+                        <AlertCircle className="w-3.5 h-3.5 text-amber-400" />
+                      </div>
+                      <span className="leading-relaxed pt-0.5">{s}</span>
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            )}
+          </div>
+        )}
+
+        {/* Domain Specific Feedback */}
+        {Object.keys(topicFeedback).length > 0 && (
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
+            className="bg-card/20 backdrop-blur-xl border border-white/5 rounded-[2.5rem] p-8 md:p-10 shadow-2xl"
+          >
+            <h3 className="text-xl font-black text-white mb-8 flex items-center gap-3 uppercase tracking-tight">
+              <Layers className="w-6 h-6 text-primary" /> Domain Analysis
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              {Object.entries(topicFeedback).map(([topic, feedback], i) => (
+                <div key={i} className="bg-white/5 border border-white/10 rounded-[1.5rem] p-6 hover:bg-white/10 transition-colors shadow-inner">
+                  <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-primary mb-3 flex items-center gap-2">
+                    <Tag className="w-3 h-3" /> {topic}
+                  </h4>
+                  <p className="text-sm text-muted-foreground leading-relaxed font-medium">
+                    {String(feedback)}
+                  </p>
                 </div>
               ))}
             </div>
           </motion.div>
         )}
 
-        {/* Strengths & Improvements */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 }}
-            className="bg-card border border-border rounded-2xl p-5 space-y-3"
-          >
-            <h3 className="text-sm font-semibold flex items-center gap-2"><TrendingUp className="w-4 h-4 text-green-400" /> Strengths</h3>
-            {safeStrengths.length === 0 ? (
-              <p className="text-xs text-muted-foreground">Keep practicing to build strengths!</p>
-            ) : (
-              <div className="space-y-2">
-                {safeStrengths.map((s, i) => (
-                  <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.45 + i * 0.05 }}
-                    className="flex items-center gap-2.5 text-xs bg-green-500/5 border border-green-500/10 rounded-xl px-3 py-2.5"
-                  >
-                    <div className="w-1.5 h-1.5 rounded-full bg-green-400 shrink-0" />{s}
-                  </motion.div>
-                ))}
+        {/* Transcript Archive */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-card/20 backdrop-blur-xl border border-white/10 rounded-[3rem] overflow-hidden shadow-2xl">
+          <button onClick={() => setShowTranscript(!showTranscript)} className="w-full flex items-center justify-between p-10 hover:bg-white/5 transition-colors">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20">
+                <FileText className="w-6 h-6 text-primary" />
               </div>
-            )}
-          </motion.div>
-          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 }}
-            className="bg-card border border-border rounded-2xl p-5 space-y-3"
-          >
-            <h3 className="text-sm font-semibold flex items-center gap-2"><Target className="w-4 h-4 text-amber-400" /> Areas to Improve</h3>
-            {safeImprovements.length === 0 ? (
-              <p className="text-xs text-muted-foreground">Great job across the board!</p>
-            ) : (
-              <div className="space-y-2">
-                {safeImprovements.map((w, i) => (
-                  <motion.div key={i} initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.45 + i * 0.05 }}
-                    className="flex items-center gap-2.5 text-xs bg-amber-500/5 border border-amber-500/10 rounded-xl px-3 py-2.5"
-                  >
-                    <div className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />{w}
-                  </motion.div>
-                ))}
+              <div className="text-left">
+                <h3 className="text-2xl font-black text-white tracking-tight">Interaction Log</h3>
+                <p className="text-[9px] text-muted-foreground font-black uppercase tracking-[0.2em] mt-1">Full technical audit</p>
               </div>
-            )}
-          </motion.div>
-        </div>
-
-        {/* Pro Tips */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
-          className="bg-card border border-border rounded-2xl p-5 space-y-3"
-        >
-          <h3 className="text-sm font-semibold flex items-center gap-2"><Lightbulb className="w-4 h-4 text-primary" /> Pro Tips</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-            {suggestions.map((s, i) => (
-              <div key={i} className="flex items-center gap-2.5 text-xs bg-primary/5 border border-primary/10 rounded-xl px-3 py-2.5">
-                <span className="text-[10px] font-mono font-bold text-primary bg-primary/10 w-5 h-5 rounded-md flex items-center justify-center shrink-0">{i + 1}</span>
-                {s}
-              </div>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Interview Transcript - WITH DB DATE FIX */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }}
-          className="bg-card border border-border rounded-2xl overflow-hidden"
-        >
-          <button onClick={() => setShowTranscript(!showTranscript)}
-            className="w-full flex items-center justify-between p-5 hover:bg-secondary/30 transition-colors"
-          >
-            <h3 className="text-sm font-semibold flex items-center gap-2">
-              <FileText className="w-4 h-4 text-primary" />
-              Interview Transcript
-              <span className="text-xs font-normal text-muted-foreground">({safeMessages.length} messages)</span>
-            </h3>
-            {showTranscript ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </div>
+            {showTranscript ? <ChevronUp className="w-5 h-5 text-muted-foreground" /> : <ChevronDown className="w-5 h-5 text-muted-foreground" />}
           </button>
 
-          {showTranscript && (
-            <motion.div initial={{ height: 0 }} animate={{ height: "auto" }} className="border-t border-border">
-              <div className="max-h-[500px] overflow-y-auto p-5 space-y-3">
-                {safeMessages.length === 0 ? (
-                  <p className="text-center text-sm text-muted-foreground py-4">No transcript recorded for this session.</p>
-                ) : (
-                  safeMessages.map((msg) => {
+          <AnimatePresence>
+            {showTranscript && (
+              <motion.div initial={{ height: 0 }} animate={{ height: "auto" }} exit={{ height: 0 }} className="border-t border-white/5 bg-black/20">
+                <div className="max-h-[500px] overflow-y-auto p-10 space-y-8 custom-scrollbar">
+                  {safeMessages.map((msg: any, i: number) => {
                     const isAI = msg.role === "ai";
-                    // THE FIX: Always convert the string back to a Date object so it doesn't crash!
-                    const msgTime = new Date(msg.timestamp); 
-                    
                     return (
-                      <div key={msg.id} className={`flex gap-2.5 items-start ${isAI ? "" : "flex-row-reverse"}`}>
-                        <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${isAI ? "bg-primary/15" : "bg-secondary"}`}>
-                          {isAI ? <Cpu className="w-3.5 h-3.5 text-primary" /> : <User className="w-3.5 h-3.5" />}
+                      <div key={i} className={`flex gap-6 ${isAI ? "" : "flex-row-reverse"}`}>
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border-2 shadow-xl ${isAI ? "bg-primary/20 text-primary border-primary/20" : "bg-white/5 text-white border-white/10"}`}>
+                          {isAI ? <Cpu className="w-5 h-5" /> : <User className="w-5 h-5" />}
                         </div>
-                        <div className={`max-w-[80%] space-y-1 ${isAI ? "" : "items-end flex flex-col"}`}>
-                          {isAI && msg.topic && (
-                            <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-primary/10 text-primary">
-                              {msg.topic} {msg.questionIndex !== undefined && `• Q${msg.questionIndex + 1}`}
-                            </span>
-                          )}
-                          <div className={`rounded-xl px-3 py-2 text-xs leading-relaxed ${
-                            isAI ? "bg-secondary/60 rounded-tl-sm" : "bg-primary text-primary-foreground rounded-tr-sm"
-                          }`}>
-                            {msg.content?.startsWith("```") ? (
-                              <pre className="font-mono text-[10px] whitespace-pre-wrap">{msg.content.replace(/```\n?/g, "")}</pre>
-                            ) : (msg.content || "")}
-                          </div>
-                          <span className="text-[9px] text-muted-foreground">
-                            {/* Now this will work safely! */}
-                            {msgTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                          </span>
+                        <div className={`max-w-[80%] space-y-2 ${isAI ? "" : "items-end flex flex-col"}`}>
+                           {isAI && msg.topic && (
+                             <span className="text-[9px] font-black uppercase tracking-[0.2em] text-primary/60">{msg.topic} Sync</span>
+                           )}
+                           <div className={`p-5 rounded-[1.75rem] leading-relaxed text-sm font-medium shadow-lg ${isAI ? "bg-white/5 rounded-tl-sm text-white border border-white/10" : "bg-primary text-primary-foreground rounded-tr-sm"}`}>
+                              {msg.content?.startsWith("```") ? (
+                                <pre className="font-mono text-xs whitespace-pre-wrap bg-black/50 p-4 rounded-xl mt-3 overflow-x-auto border border-white/5">{msg.content.replace(/```\n?/g, "")}</pre>
+                              ) : (msg.content || "")}
+                           </div>
+                           <span className="text-[8px] text-muted-foreground/30 font-black uppercase tracking-widest px-2">
+                              {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                           </span>
                         </div>
                       </div>
                     );
-                  })
-                )}
-              </div>
-            </motion.div>
-          )}
+                  })}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
 
-        {/* Actions */}
-        <div className="flex gap-4">
-          <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} onClick={onBack}
-            className="flex-1 flex items-center justify-center gap-3 bg-secondary text-foreground py-4 rounded-2xl font-semibold text-base border border-border"
+        {/* Navigation Actions */}
+        <div className="flex flex-col sm:flex-row gap-5 pt-6 relative z-10">
+          <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={onBack}
+            className="flex-1 bg-white/5 text-white py-5 rounded-[1.75rem] font-black uppercase tracking-[0.2em] text-xs border border-white/10 flex items-center justify-center gap-3 hover:bg-white/10 transition-all shadow-xl"
           >
-            <ArrowLeft className="w-5 h-5" /> Back to History
+            <Clock className="w-4 h-4 opacity-40" /> Archive Overview
           </motion.button>
-          <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} onClick={onNewInterview}
-            className="flex-1 flex items-center justify-center gap-3 bg-primary text-primary-foreground py-4 rounded-2xl font-semibold text-base"
+          <motion.button whileHover={{ scale: 1.02, boxShadow: "0 0 30px rgba(59,130,246,0.3)" }} whileTap={{ scale: 0.98 }} onClick={onNewInterview}
+            className="flex-1 bg-primary text-primary-foreground py-5 rounded-[1.75rem] font-black uppercase tracking-[0.2em] text-xs shadow-2xl flex items-center justify-center gap-3 transition-all"
           >
-            <RotateCcw className="w-5 h-5" /> Start New Interview
+            <RotateCcw className="w-4 h-4" /> Initialize New DNA Sync
           </motion.button>
         </div>
       </div>

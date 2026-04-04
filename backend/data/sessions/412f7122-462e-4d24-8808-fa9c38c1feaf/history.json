@@ -1,0 +1,25 @@
+[
+  {
+    "question": "Can you describe the difference in design approach for a binary relationship with n:m cardinality as opposed to n:1 cardinality when it comes to real-world implementation of a project involving database management?",
+    "answer": "daa",
+    "analysis": {
+      "clarity": 3,
+      "confidence": 1,
+      "technical": 1,
+      "overall": 1.67
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0
+    },
+    "environment": {
+      "faces_detected": 2,
+      "background_voice": false,
+      "voice_level": 1.0,
+      "warnings": [
+        "\u26a0\ufe0f Multiple people detected. Please ensure you are alone."
+      ],
+      "final_flags": []
+    }
+  }
+]

@@ -1,0 +1,74 @@
+[
+  {
+    "question": "Can you describe how you would implement database design for a project that involves course enrollment with n:1 cardinality, specifically focusing on the skills you would use to normalize the database and ensure data consistency?",
+    "answer": "I am confident in my answer",
+    "analysis": {
+      "clarity": 1,
+      "confidence": 0,
+      "technical": 0,
+      "overall": 0.33
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.4939
+    },
+    "environment": {
+      "faces_detected": 2,
+      "background_voice": true,
+      "voice_level": 0.9,
+      "warnings": [
+        "\u26a0\ufe0f Multiple people detected. Please ensure you are alone.",
+        "\u26a0\ufe0f Background voice detected. Please ensure a quiet environment."
+      ],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Have you actually implemented this binary relationship scenario in a real-world project, and if so, how did you ensure data consistency across the two tables?",
+    "answer": "I am confident in my answer",
+    "analysis": {
+      "clarity": 2,
+      "confidence": 10,
+      "technical": 0,
+      "overall": 4.0
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.4939
+    },
+    "environment": {
+      "faces_detected": 2,
+      "background_voice": true,
+      "voice_level": 0.9,
+      "warnings": [
+        "\u26a0\ufe0f Multiple people detected. Please ensure you are alone.",
+        "\u26a0\ufe0f Background voice detected. Please ensure a quiet environment."
+      ],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Given that ignoring deadlock and just rebooting the system is one possible approach, how do you think it would be possible to implement something like this, while still providing the necessary reliability for other operating system components to keep running even in the presence of deadlocks?",
+    "answer": "I am confident in my answer",
+    "analysis": {
+      "clarity": 2,
+      "confidence": 6,
+      "technical": 0,
+      "overall": 2.67
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.4939
+    },
+    "environment": {
+      "faces_detected": 2,
+      "background_voice": true,
+      "voice_level": 0.9,
+      "warnings": [],
+      "final_flags": [
+        "\ud83d\udea8 Repeated multiple-person detection",
+        "\ud83d\udea8 Repeated background voice detected"
+      ]
+    }
+  }
+]

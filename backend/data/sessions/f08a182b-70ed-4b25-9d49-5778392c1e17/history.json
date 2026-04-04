@@ -1,0 +1,59 @@
+[
+  {
+    "question": "Can you describe how you would implement a project to manage student enrollment and elective courses in a database management system, and what skills would you use to achieve this task?",
+    "answer": "I am confident in my answer",
+    "analysis": {
+      "clarity": 5,
+      "confidence": 8,
+      "technical": 0,
+      "overall": 4.33
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.4939
+    },
+    "environment": {
+      "faces_detected": 1,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Have you actually implemented a solution to handle this binary relationship scenario in a real-world project, or is this purely a theoretical concept?",
+    "answer": "I am confident in my answer",
+    "analysis": {
+      "clarity": 2,
+      "confidence": 9,
+      "technical": 0,
+      "overall": 3.67
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.4939
+    },
+    "environment": {
+      "faces_detected": 1,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Given that a database index improves the speed of data retrieval operations but requires additional storage space, describe how you would optimize the indexing strategy in a high-traffic e-commerce database to maintain a balance between query performance and storage requirements.",
+    "answer": "I am confident in my answer",
+    "analysis": {
+      "clarity": 2,
+      "confidence": 9,
+      "technical": 0,
+      "overall": 3.67
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.4939
+    },
+    "environment": {
+      "faces_detected": 1,
+      "warnings": [],
+      "final_flags": []
+    }
+  }
+]

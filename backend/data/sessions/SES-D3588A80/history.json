@@ -1,0 +1,128 @@
+[
+  {
+    "question": "Can you describe a project where you implemented a machine learning model to a real-world problem in a production environment?",
+    "answer": "new model in a real world problem that is added action model for landslide prediction",
+    "analysis": {
+      "clarity": 4,
+      "confidence": 3,
+      "technical": 6,
+      "overall": 4.33
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": -0.4019
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Can you elaborate on what you meant by 'added action model' in the landslide prediction project and how it improved the overall model's performance?",
+    "answer": "new model in a real world problem that is added action model for landslide prediction new model in a real world problem that is added action model for landslide prediction",
+    "analysis": {
+      "clarity": 2,
+      "confidence": 0,
+      "technical": 0,
+      "overall": 0.67
+    },
+    "sentiment": {
+      "tone": "nervous",
+      "score": -0.6597
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Consider you're working on a database that stores transactions for a large online e-commerce platform, and you need to query customer order history for analytics purposes. Describe how would you decide which data normalization technique to apply, and how would you benefit from it in terms of database integrity and performance.",
+    "answer": "I guess 3nf normalization should be used",
+    "analysis": {
+      "clarity": 4,
+      "confidence": 3,
+      "technical": 2,
+      "overall": 3.0
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "How would you handle the scenario where multiple operating system processes simultaneously attempt to read and write to the same shared memory location, while maintaining consistency and minimizing the risk of data corruption?",
+    "answer": "normalization technique should be used in that",
+    "analysis": {
+      "clarity": 6,
+      "confidence": 8,
+      "technical": 5,
+      "overall": 6.33
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Implement a function to merge two sorted linked lists into one sorted linked list. The linked lists are represented as follows: \nthe head of the list is the first node, and each node contains an integer value and a reference to the next node.\n\nGiven the heads of two sorted linked lists, merge them in a way that the merged list is also sorted.\n\nWhat is your solution? \n\nWhat is the time complexity and space complexity of your solution?",
+    "answer": "linked list into linked list is equal to sorted LinkedIn linked list into linked list is equal to sorted LinkedIn",
+    "analysis": {
+      "clarity": 2,
+      "confidence": 3,
+      "technical": 0,
+      "overall": 1.67
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "\"Write a function that takes an array of integers and returns the size of the largest rectangular prism that can be formed using the bars of heights provided in the array. Each bar's width is assumed to be 1 unit. You may rotate the array to get the maximum size.\"",
+    "answer": "if else when then",
+    "analysis": {
+      "clarity": 4,
+      "confidence": 2,
+      "technical": 1,
+      "overall": 2.33
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  }
+]

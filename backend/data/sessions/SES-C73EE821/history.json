@@ -1,0 +1,128 @@
+[
+  {
+    "question": "Describe a real-world scenario in which you would use the skills you have listed, specifically Python, LLMs, and APIs like Twilio, to build an innovative solution.",
+    "answer": "hello I am Shardul",
+    "analysis": {
+      "clarity": 2,
+      "confidence": 0,
+      "technical": 0,
+      "overall": 0.67
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Can you give a real-world example of how you applied the skills you've listed in an actual project?",
+    "answer": "I have implemented you",
+    "analysis": {
+      "clarity": 3,
+      "confidence": 4,
+      "technical": 0,
+      "overall": 2.33
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "How would you handle a situation where the swapping technique, in a multiprogramming environment, causes inefficient use of disk space and slow disk I/O due to high frequency of swapping processes in and out of memory?",
+    "answer": "I don't actually know this",
+    "analysis": {
+      "clarity": 5,
+      "confidence": 3,
+      "technical": 0,
+      "overall": 2.67
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Now that you're aware that encapsulation is a key concept in object-oriented programming, can you explain how encapsulation is achieved using private access modifiers in a Java class?",
+    "answer": "using child class",
+    "analysis": {
+      "clarity": 6,
+      "confidence": 7,
+      "technical": 8,
+      "overall": 7.0
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "So we have an array representing a grid of cells, some of which are infected by a disease, and we want to contain the spread of the disease by putting a wall around the infected cells in the minimum number of moves. \n\nGiven a binary grid representing cells, with 0 indicating healthy and 1 indicating infected, find the minimum number of steps required by a wall to contain all infected cells.\n\nTime complexity, please? \nCan you explain your approach?",
+    "answer": "no no",
+    "analysis": {
+      "clarity": 2,
+      "confidence": 4,
+      "technical": 0,
+      "overall": 2.0
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.2235
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Here's your coding challenge, you have 30 minutes.\n\nYou are given a 2D grid where each cell can be either 1 or 0 representing a wall or a path respectively in a maze. \nWrite a function that takes in two points, a start point (0, 0) and an end point, and returns the minimum number of steps required to navigate from the start to the end of the maze avoiding the walls. \n\nTime complexity: O(m*n) \nSpace complexity: O(m*n)",
+    "answer": "no no no no",
+    "analysis": {
+      "clarity": 0,
+      "confidence": 1,
+      "technical": 0,
+      "overall": 0.33
+    },
+    "sentiment": {
+      "tone": "confident",
+      "score": 0.5667
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  }
+]

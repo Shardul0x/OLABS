@@ -1,0 +1,86 @@
+[
+  {
+    "question": "Assuming you've worked on a database project that involved binary relationships, describe one real-world implementation of a binary database project with a 1:n cardinality that you were involved in.",
+    "answer": "abc",
+    "analysis": {
+      "clarity": 2,
+      "confidence": 3,
+      "technical": 0,
+      "overall": 1.67
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 1.157997857603732e-07,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Can you explain how you would implement student elective course enrollment in a relational database for multiple students and courses in a real-world system?",
+    "answer": "cassd",
+    "analysis": {
+      "clarity": 0,
+      "confidence": 0,
+      "technical": 0,
+      "overall": 0.0
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 1.157997857603732e-07,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "How would you implement the Observer pattern in a system where you have multiple types of subjects and multiple types of observers, while keeping the subject-independent observer logic organized?",
+    "answer": "asdasd",
+    "analysis": {
+      "clarity": 0,
+      "confidence": 0,
+      "technical": 0,
+      "overall": 0.0
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 1.157997857603732e-07,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "How would you implement transaction isolation in a system to prevent concurrent updates from producing inconsistent database states?",
+    "answer": "asd",
+    "analysis": {
+      "clarity": 0,
+      "confidence": 0,
+      "technical": 0,
+      "overall": 0.0
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 1.157997857603732e-07,
+      "warnings": [],
+      "final_flags": []
+    }
+  }
+]

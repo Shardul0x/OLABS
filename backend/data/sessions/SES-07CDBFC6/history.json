@@ -1,0 +1,23 @@
+[
+  {
+    "question": "Can you explain your approach to implementing a text classification model using a deep learning architecture like CNN or LSTM to classify spam versus non-spam messages using publicly available datasets?",
+    "answer": "hello my name is Sharda Patil",
+    "analysis": {
+      "clarity": 8,
+      "confidence": 6,
+      "technical": 0,
+      "overall": 4.67
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  }
+]

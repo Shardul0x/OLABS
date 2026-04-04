@@ -1,0 +1,23 @@
+[
+  {
+    "question": "Describe your experience with designing database schemas for multiple projects, focusing on how you handle binary relationships with 1:n cardinality.",
+    "answer": "a",
+    "analysis": {
+      "clarity": 0,
+      "confidence": 0,
+      "technical": 0,
+      "overall": 0.0
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0.0,
+      "warnings": [],
+      "final_flags": []
+    }
+  }
+]
