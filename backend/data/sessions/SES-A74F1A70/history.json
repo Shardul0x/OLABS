@@ -1,0 +1,128 @@
+[
+  {
+    "question": "You mentioned having practical development skills in your application letter, however, can you describe a real-world project where you applied database management systems concepts to solve a problem?",
+    "answer": "I have made an inventory management system using DBMS 1st year",
+    "analysis": {
+      "clarity": 2,
+      "confidence": 3,
+      "technical": 2,
+      "overall": 2.33
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Can you walk me through how you approached database design for the inventory management system in your first year, and how you optimized it for frequent queries and updates?",
+    "answer": "```\nI have used post gresql  for making the database for inventory and moreover I  have to enf3nf and 4 and F functions normalization techniques and acid etc\n```",
+    "analysis": {
+      "clarity": 4,
+      "confidence": 3,
+      "technical": 6,
+      "overall": 4.33
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Let's say you're designing the data model for a new e-commerce platform that will have millions of users, each with a large number of orders. However, you also need to store additional information for each order, such as shipping details and payment information from external services. What database normalization technique would you use to avoid potential data inconsistency in this scenario?",
+    "answer": "I will prefer using 5 and F normalisation technique as there is very large number",
+    "analysis": {
+      "clarity": 6,
+      "confidence": 4,
+      "technical": 4,
+      "overall": 4.67
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.1477
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Assuming that your system uses a mix of process and thread based programming, what would you do in the case where one thread of a process is stuck in an infinite loop causing a high CPU usage, and your system doesn't allow automatic restart of threads due to safety reasons?",
+    "answer": "```\nenvironment and infinite loop in a single thread is particularly thorny issue because Threads share the same address is you cannot simply kill a thread from outside without risking deadlocks if the thread held a mutex or memory corruption if it was half away through writing to a share data structure since your system for BITS automatically starts or safety strategy must move from surgical removal to control termination environment and infinite loop in a single thread is particularly thorny issue because Threads share the same address is you cannot simply kill a thread from outside without risking deadlocks if the thread held a mutex or memory corruption if it was half away through writing to a share data structure since your system for BITS automatically starts or safety strategy must move from surgical removal to control termination\n```",
+    "analysis": {
+      "clarity": 2,
+      "confidence": 1,
+      "technical": 6,
+      "overall": 3.0
+    },
+    "sentiment": {
+      "tone": "confident",
+      "score": 0.9585
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Consider you are the manager of a big hotel and you have a big table to keep track of booked rooms. Each room in the hotel can have at most one guest. Given a list L of room numbers and corresponding guest names, and a query list Q of room numbers, for each query R of a room number, return the name of the guest that is checked in that room, or return -1 if no guest is checked in that room.\n\nPlease write an efficient algorithm to solve this problem and give me the time and space complexity. Can you also explain why your algorithm is efficient?",
+    "answer": "```\ndef get_hotel_guests(L, Q):\n    # Step 1: Initialize the \"Table\" (Hash Map)\n    room_registry = {}\n    \n    # Step 2: Fill the table with the list of bookings\n    # L is a list of tuples: [(room_number, guest_name), ...]\n    for room, name in L:\n        room_registry[room] = name\n        \n    # Step 3: Process the queries\n    results = []\n    for query_room in Q:\n        # Check if the room exists in our registry\n        if query_room in room_registry:\n            results.append(room_registry[query_room])\n        else:\n            results.append(-1)\n            \n    return results\n\n# Example Usage:\nbookings = [(101, \"Alice\"), (202, \"Bob\"), (305, \"Charlie\")]\nqueries = [101, 404, 202]\n# Output: [\"Alice\", -1, \"Bob\"]\n```\n\n[System Note to AI: The candidate provided the code implementation but omitted the time/space complexity estimation. Please grade the provided code logic accurately, and gently remind them to provide the complexity.]",
+    "analysis": {
+      "clarity": 8,
+      "confidence": 7,
+      "technical": 6,
+      "overall": 7.0
+    },
+    "sentiment": {
+      "tone": "confident",
+      "score": 0.8525
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Given an array of integers, find all unique triplets in the array that sum up to zero. You may not use the same element in triplets more than once. The result can be any permutation of the array.\n\nCan you write a function to solve this problem? \n\nPlease give me the time and space complexities of your solution, as well as the language you use to write this function.",
+    "answer": "```\ndef three_sum(nums):\n    nums.sort()  # Step 1: Sort the array\n    result = []\n    n = len(nums)\n    \n    for i in range(n - 2):\n        # Skip the same element to avoid duplicate triplets\n        if i > 0 and nums[i] == nums[i - 1]:\n            continue\n            \n        # Optimization: If the smallest possible sum is > 0, stop\n        if nums[i] + nums[i+1] + nums[i+2] > 0:\n            break\n            \n        left, right = i + 1, n - 1\n        \n        while left < right:\n            total = nums[i] + nums[left] + nums[right]\n            \n            if total == 0:\n                result.append([nums[i], nums[left], nums[right]])\n                \n                # Move pointers and skip duplicates\n                while left < right and nums[left] == nums[left + 1]:\n                    left += 1\n                while left < right and nums[right] == nums[right - 1]:\n                    right -= 1\n                    \n                left += 1\n                right -= 1\n            elif total < 0:\n                left += 1\n            else:\n                right -= 1\n                \n    return result\n\n# Example:\n# Input: [-1, 0, 1, 2, -1, -4]\n# Output: [[-1, -1, 2], [-1, 0, 1]]\n```\n\n[System Note to AI: The candidate provided the code implementation but omitted the time/space complexity estimation. Please grade the provided code logic accurately, and gently remind them to provide the complexity.]",
+    "analysis": {
+      "clarity": 9,
+      "confidence": 8,
+      "technical": 8,
+      "overall": 8.33
+    },
+    "sentiment": {
+      "tone": "confident",
+      "score": 0.7615
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  }
+]

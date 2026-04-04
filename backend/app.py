@@ -11,22 +11,25 @@ from utils.session_manager import create_session
 from utils.file_handler import save_resume, save_manual_pdf
 from core.rag_pipeline import build_vector_store
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     yield
     print("🛑 Server shutting down...")
 
+
 app = FastAPI(title="HireMind AI Backend", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=".*", 
+    allow_origin_regex=".*",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 sessions: dict[str, InterviewController] = {}
+
 
 @app.get("/")
 async def health_check():
@@ -39,6 +42,7 @@ async def health_check():
         }
     }
 
+
 @app.post("/start-interview")
 @app.post("/api/start")
 async def start_interview_api(
@@ -50,15 +54,15 @@ async def start_interview_api(
     try:
         form = await request.form()
         resume_file = form.get("file") or form.get("resume")
-        
+
         if not resume_file:
-            raise HTTPException(status_code=400, detail="Resume file is missing from the request.")
+            raise HTTPException(status_code=400, detail="Resume file is missing.")
 
         try:
             session_metadata = create_session(user_id, mode)
         except TypeError:
             session_metadata = create_session()
-            
+
         session_id = session_metadata["session_id"]
 
         file_bytes = await resume_file.read()
@@ -77,21 +81,25 @@ async def start_interview_api(
         controller = InterviewController(session_id)
         sessions[session_id] = controller
 
-        first_question = controller.next_question()
+        # ✅ next_question() now returns a dict
+        first_result = controller.next_question()
 
         return {
-            "session_id": session_id,
-            "first_question": first_question,
-            "status": "success"
+            "session_id":     session_id,
+            "first_question": first_result["next_question"],
+            "status":         "success"
         }
+
     except Exception as e:
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.post("/stop-monitor")
 @app.post("/api/stop")
 async def stop_monitor(session_id: str = Form(...)):
     return {"status": "Hardware released"}
+
 
 @app.post("/submit-answer")
 @app.post("/api/answer")
@@ -109,15 +117,11 @@ async def submit_answer(
 
         controller = sessions[session_id]
 
+        # ✅ result is always a clean dict now
         result = controller.process_answer(
             answer,
             input_data={"faces_detected": faces_detected}
         )
-
-        next_q = result.get("next_question")
-        if isinstance(next_q, tuple):
-            result["next_question"] = next_q[0]
-            result["report"]        = next_q[1]
 
         result["faces_used"] = faces_detected
         return result
@@ -125,6 +129,7 @@ async def submit_answer(
     except Exception as e:
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

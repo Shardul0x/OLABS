@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Send, Mic, MicOff, AlertTriangle, Code2,
+  Send, Mic, MicOff, AlertTriangle,
   User, StopCircle, Cpu, AlertCircle, Terminal
 } from "lucide-react";
 import { useInterview, ChatMessage } from "../contexts/InterviewContext";
@@ -29,24 +29,20 @@ const roundColors: Record<string, string> = {
 };
 
 function useSpeechRecognition({
-  onResult,
-  onEnd,
-  onError,
+  onResult, onEnd, onError,
 }: {
   onResult: (text: string) => void;
   onEnd: () => void;
   onError: (msg: string) => void;
 }) {
-  const recognitionRef   = useRef<SpeechRecognition | null>(null);
-  const runningRef       = useRef(false);
-  const accumulatedRef   = useRef(""); 
-  const interimRef       = useRef(""); 
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const runningRef     = useRef(false);
+  const accumulatedRef = useRef("");
+  const interimRef     = useRef("");
 
   const isSupported = useCallback((): boolean => {
-    return (
-      typeof window !== "undefined" &&
-      ("SpeechRecognition" in window || "webkitSpeechRecognition" in window)
-    );
+    return typeof window !== "undefined" &&
+      ("SpeechRecognition" in window || "webkitSpeechRecognition" in window);
   }, []);
 
   const finalizeTranscript = useCallback(() => {
@@ -60,27 +56,23 @@ function useSpeechRecognition({
 
   const start = useCallback(async () => {
     if (runningRef.current) return;
-
     if (!isSupported()) {
       onError("Speech recognition is not supported in this browser. Use Chrome or Edge, or type your answer.");
       return;
     }
-
     try {
       const status = await navigator.permissions.query({ name: "microphone" as PermissionName });
       if (status.state === "denied") {
         onError("Microphone access is blocked. Open browser Settings → Site permissions → Microphone and allow this site.");
         return;
       }
-    } catch {
-      // proceed to browser prompt
-    }
+    } catch { /* proceed */ }
 
-    const SR: typeof SpeechRecognition = (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition;
-
+    const SR: typeof SpeechRecognition =
+      (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition;
     const rec = new SR();
-    rec.continuous      = true;   
-    rec.interimResults  = true;   
+    rec.continuous      = true;
+    rec.interimResults  = true;
     rec.lang            = "en-US";
     rec.maxAlternatives = 1;
 
@@ -90,30 +82,22 @@ function useSpeechRecognition({
     rec.onresult = (e: SpeechRecognitionEvent) => {
       let interim = "";
       let finalSegment = "";
-
       for (let i = e.resultIndex; i < e.results.length; i++) {
         const t = e.results[i][0].transcript;
-        if (e.results[i].isFinal) {
-          finalSegment += t + " ";
-        } else {
-          interim += t;
-        }
+        if (e.results[i].isFinal) finalSegment += t + " ";
+        else interim += t;
       }
-
       if (finalSegment) {
         accumulatedRef.current += finalSegment;
         interimRef.current = "";
       } else {
         interimRef.current = interim;
       }
-
-      const full = (accumulatedRef.current + interim).trim();
-      onResult(full);
+      onResult((accumulatedRef.current + interim).trim());
     };
 
     rec.onerror = (e: SpeechRecognitionErrorEvent) => {
-      const silent = ["aborted", "no-speech"];
-      if (!silent.includes(e.error)) {
+      if (!["aborted", "no-speech"].includes(e.error)) {
         onError(
           e.error === "not-allowed"
             ? "Microphone permission denied. Allow mic access in your browser and reload."
@@ -126,13 +110,10 @@ function useSpeechRecognition({
 
     rec.onend = () => {
       if (runningRef.current) {
-        try {
-          rec.start();
-        } catch (err: unknown) {
+        try { rec.start(); } catch (err: unknown) {
           const msg = err instanceof Error ? err.message : "";
-          if (!msg.includes("already") && !msg.includes("InvalidState")) {
+          if (!msg.includes("already") && !msg.includes("InvalidState"))
             console.warn("SpeechRecognition restart failed:", err);
-          }
         }
       } else {
         finalizeTranscript();
@@ -142,7 +123,6 @@ function useSpeechRecognition({
 
     recognitionRef.current = rec;
     runningRef.current     = true;
-
     try {
       rec.start();
     } catch (err) {
@@ -174,34 +154,36 @@ const InterviewPage = () => {
   const {
     sessionId, questions, currentQuestionIndex,
     isLoading, mode, setIsLoading,
-    micOn, setMicOn,
+    setMicOn,
     isRecording, setIsRecording,
     facesDetected, addAnswer, nextQuestion,
     chatMessages, addChatMessage,
     environmentWarnings,
-    interviewActive, stopSession: stopContextSession,
+    stopSession: stopContextSession,
   } = useInterview();
 
-  const [userInput,    setUserInput]    = useState("");
-  const [codeInput,    setCodeInput]    = useState("");
-  const [isTyping,     setIsTyping]     = useState(false);
-  const [isAnalyzing,  setIsAnalyzing]  = useState(false);
-  const [isFinished,   setIsFinished]   = useState(false);
-  const [voiceError,   setVoiceError]   = useState<string | null>(null);
+  const [userInput,   setUserInput]   = useState("");
+  const [codeInput,   setCodeInput]   = useState("");
+  const [isTyping,    setIsTyping]    = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isFinished,  setIsFinished]  = useState(false);
+  const [voiceError,  setVoiceError]  = useState<string | null>(null);
 
   const chatEndRef = useRef<HTMLDivElement>(null);
 
+  const apiUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+
   const currentQ     = questions[currentQuestionIndex];
   const currentRound = currentQ?.round;
+  const latestAIMsg  = chatMessages.slice().reverse().find(m => m.role === "ai");
+  const activeTopic  = latestAIMsg?.topic?.toUpperCase() || currentQ?.topic?.toUpperCase() || "";
 
-  const latestAIMsg = chatMessages.slice().reverse().find(m => m.role === "ai");
-  const activeTopic = latestAIMsg?.topic?.toUpperCase() || currentQ?.topic?.toUpperCase() || "";
-  
-  // ⚡ Text heuristics to detect coding questions
-  const isDSA = activeTopic === "DSA" || 
-                currentQ?.type === "dsa" || 
-                currentRound === "DSA" ||
-                (latestAIMsg?.content && /write a function|implement a function|coding challenge|time complexity|space complexity|pseudo-?code|array of/i.test(latestAIMsg.content));
+  const isDSA = activeTopic === "DSA" ||
+    currentQ?.type === "dsa" ||
+    currentRound === "DSA" ||
+    (latestAIMsg?.content &&
+      /write a function|implement a function|coding challenge|time complexity|space complexity|pseudo-?code|array of/i
+        .test(latestAIMsg.content));
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -209,37 +191,25 @@ const InterviewPage = () => {
 
   const stopSession = useCallback(async () => {
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
       await fetch(`${apiUrl}/api/stop`, {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({ session_id: sessionId })
+        body: new URLSearchParams({ session_id: sessionId }),
       });
-    } catch (e) {
-      console.warn("Backend monitor stop failed.");
-    }
+    } catch { console.warn("Backend monitor stop failed."); }
     stopContextSession();
-  }, [sessionId, stopContextSession]);
+  }, [sessionId, stopContextSession, apiUrl]);
 
-  const onResult = useCallback((text: string) => {
-    setUserInput(text);
-  }, []);
-
-  const onEnd = useCallback(() => {
-    setIsRecording(false);
-  }, [setIsRecording]);
-
-  const onError = useCallback((msg: string) => {
+  const onResult = useCallback((text: string) => setUserInput(text), []);
+  const onEnd    = useCallback(() => setIsRecording(false), [setIsRecording]);
+  const onError  = useCallback((msg: string) => {
     setVoiceError(msg);
     setIsRecording(false);
     setTimeout(() => setVoiceError(null), 8000);
   }, [setIsRecording]);
 
-  const { start: startRec, stop: stopRec, isSupported } = useSpeechRecognition({
-    onResult,
-    onEnd,
-    onError,
-  });
+  const { start: startRec, stop: stopRec, isSupported } =
+    useSpeechRecognition({ onResult, onEnd, onError });
 
   const toggleRecording = useCallback(() => {
     if (isRecording) {
@@ -261,16 +231,15 @@ const InterviewPage = () => {
 
     if (!answerText || isLoading) return;
 
-    // ⚡ FIX: Smart detection. Even if user types in the normal chat box, 
-    // if it contains code-like structure, wrap it in Markdown backticks.
     const isCodeLike = /function|for|while|if|return|def|class|{|}|;/i.test(answerText);
-    let formattedContent = (isDSA || isCodeLike || codeInput.trim()) && !answerText.startsWith("```") 
-      ? `\`\`\`\n${answerText}\n\`\`\`` 
-      : answerText;
+    let formattedContent =
+      (isDSA || isCodeLike || codeInput.trim()) && !answerText.startsWith("```")
+        ? `\`\`\`\n${answerText}\n\`\`\``
+        : answerText;
 
-    // ⚡ FIX: Prevent LLM from failing you completely if you forget time/space complexity
     if (isDSA && !answerText.toLowerCase().includes("complexity")) {
-      formattedContent += "\n\n[System Note to AI: The candidate provided the code implementation but omitted the time/space complexity estimation. Please grade the provided code logic accurately, and gently remind them to provide the complexity.]";
+      formattedContent +=
+        "\n\n[System Note to AI: The candidate provided the code implementation but omitted the time/space complexity estimation. Please grade the provided code logic accurately, and gently remind them to provide the complexity.]";
     }
 
     addChatMessage({
@@ -287,15 +256,14 @@ const InterviewPage = () => {
     setIsLoading(true);
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
       const response = await fetch(`${apiUrl}/api/answer`, {
-        method: "POST",
+        method:  "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams({
-          session_id: sessionId,
-          answer: formattedContent,
-          faces_detected: facesDetected.toString()
-        })
+          session_id:     sessionId,
+          answer:         formattedContent,
+          faces_detected: facesDetected.toString(),
+        }),
       });
 
       const data = await response.json();
@@ -306,33 +274,39 @@ const InterviewPage = () => {
 
       addAnswer({
         questionIndex: currentQuestionIndex,
-        question: currentQ?.text || "",
-        topic: currentQ?.topic || "General",
-        answer: answerText,
+        question:      currentQ?.text  || "",
+        topic:         currentQ?.topic || "General",
+        answer:        answerText,
         facesDetected,
-        scores: data.analysis || { clarity: 80, confidence: 80, technical: 80, overall: 80 },
+        scores: {
+          clarity:    Math.round((data.analysis?.clarity    ?? 5) * 10),
+          confidence: Math.round((data.analysis?.confidence ?? 5) * 10),
+          technical:  Math.round((data.analysis?.technical  ?? 5) * 10),
+          overall:    Math.round((data.analysis?.overall    ?? 5) * 10),
+        },
         analysis: {
-          sentiment: data.sentiment?.tone || "Neutral",
-          speakingConfidence: (data.analysis?.confidence || 8) * 10,
-          communicationQuality: (data.analysis?.clarity || 8) * 10,
-          bodyLanguage: 80, eyeContact: 85, facialConfidence: 82,
+          sentiment:            data.sentiment?.tone || "Neutral",
+          speakingConfidence:   Math.round((data.analysis?.confidence ?? 5) * 10),
+          communicationQuality: Math.round((data.analysis?.clarity    ?? 5) * 10),
+          bodyLanguage:         80,
+          eyeContact:           85,
+          facialConfidence:     Math.round((data.analysis?.confidence ?? 5) * 10),
         },
       });
 
-      if (data.next_question && data.next_question !== "Interview complete.") {
-        setTimeout(() => {
-          setIsTyping(false);
-          addChatMessage({
-            id: `msg-ai-${Date.now()}`,
-            role: "ai",
-            content: data.next_question,
-            timestamp: new Date(),
-            questionIndex: currentQuestionIndex + 1,
-            topic: data.topic || "Technical"
-          });
-          nextQuestion();
-        }, 1200);
-      } else if (data.next_question === "Interview complete." || data.report) {
+      const env = data.environment ?? {};
+      (env.warnings    ?? []).forEach((w: string) => addChatMessage({
+        id: `warn-${Date.now()}-${w}`, role: "ai",
+        content: w, timestamp: new Date(),
+      }));
+
+      // ✅ Check completion using is_complete flag OR string match
+      const isComplete =
+        data.is_complete === true ||
+        (typeof data.next_question === "string" &&
+          data.next_question.toLowerCase().includes("interview complete"));
+
+      if (isComplete) {
         setIsTyping(false);
         setIsFinished(true);
         setIsAnalyzing(true);
@@ -340,9 +314,31 @@ const InterviewPage = () => {
           setIsAnalyzing(false);
           stopSession();
         }, 3000);
+
+      } else if (data.next_question) {
+        const nextText = typeof data.next_question === "string"
+          ? data.next_question
+          : String(data.next_question);
+
+        setTimeout(() => {
+          setIsTyping(false);
+          addChatMessage({
+            id:            `msg-ai-${Date.now()}`,
+            role:          "ai",
+            content:       nextText,
+            timestamp:     new Date(),
+            questionIndex: currentQuestionIndex + 1,
+            topic:         data.topic || "Technical",
+          });
+          nextQuestion();
+        }, 1200);
+
       } else {
-        throw new Error("Invalid response format received from backend.");
+        // Graceful fallback — don't throw
+        setIsTyping(false);
+        console.warn("Unexpected response shape:", data);
       }
+
     } catch (err: any) {
       console.error(err);
       setIsTyping(false);
@@ -355,21 +351,17 @@ const InterviewPage = () => {
     isRecording, stopRec, isDSA, codeInput, userInput,
     isLoading, addChatMessage, currentQuestionIndex,
     sessionId, facesDetected, currentQ, addAnswer,
-    nextQuestion, stopSession, setIsLoading
+    nextQuestion, stopSession, setIsLoading, apiUrl,
   ]);
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      // Allow Enter to create new line in DSA terminal without submitting
-      if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
-        handleSubmit();
-      } else if (!isDSA && e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault();
-        handleSubmit();
-      }
-    },
-    [handleSubmit, isDSA],
-  );
+  const onKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+      handleSubmit();
+    } else if (!isDSA && e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit();
+    }
+  }, [handleSubmit, isDSA]);
 
   const canSubmit = (userInput.trim() || codeInput.trim()) && !isLoading;
 
@@ -441,7 +433,6 @@ const InterviewPage = () => {
       </div>
 
       <div className="flex-1 flex max-w-6xl mx-auto w-full gap-4 px-4">
-
         <div className="flex-1 flex flex-col min-w-0">
           <div className="flex-1 overflow-y-auto py-4 space-y-4 px-2">
             {chatMessages.map((msg) => <ChatBubble key={msg.id} message={msg} />)}
@@ -451,12 +442,17 @@ const InterviewPage = () => {
                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
                   <Cpu className="w-4 h-4 text-primary" />
                 </div>
-                <div className="glass rounded-2xl rounded-tl-sm px-4 py-3"><TypingIndicator /></div>
+                <div className="glass rounded-2xl rounded-tl-sm px-4 py-3">
+                  <TypingIndicator />
+                </div>
               </div>
             )}
 
             {isLoading && !isTyping && (
-              <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} className="flex gap-3 items-start">
+              <motion.div
+                initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }}
+                className="flex gap-3 items-start"
+              >
                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
                   <Cpu className="w-4 h-4 text-primary" />
                 </div>
@@ -478,21 +474,29 @@ const InterviewPage = () => {
               >
                 <motion.div
                   className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center"
-                  animate={{ rotate: [0, 360] }} transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                  animate={{ rotate: [0, 360] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
                 >
                   <Cpu className="w-8 h-8 text-primary" />
                 </motion.div>
                 <div className="text-center space-y-2">
-                  <motion.p className="text-lg font-semibold"
-                    animate={{ opacity: [0.5, 1, 0.5] }} transition={{ duration: 2, repeat: Infinity }}>
+                  <motion.p
+                    className="text-lg font-semibold"
+                    animate={{ opacity: [0.5, 1, 0.5] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
                     Analysing your interview…
                   </motion.p>
                   <p className="text-sm text-muted-foreground">Generating feedback &amp; insights</p>
                 </div>
                 <div className="flex gap-1">
-                  {[0,1,2,3,4].map((i) => (
-                    <motion.div key={i} className="w-2 h-8 bg-primary/30 rounded-full"
-                      animate={{ height: [8, 32, 8] }} transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.15 }} />
+                  {[0, 1, 2, 3, 4].map((i) => (
+                    <motion.div
+                      key={i}
+                      className="w-2 h-8 bg-primary/30 rounded-full"
+                      animate={{ height: [8, 32, 8] }}
+                      transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.15 }}
+                    />
                   ))}
                 </div>
               </motion.div>
@@ -503,9 +507,11 @@ const InterviewPage = () => {
 
           {!isAnalyzing && (
             <div className="sticky bottom-0 glass-strong border-t border-border p-4 space-y-3">
-
               {isDSA && (
-                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-2">
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                  className="space-y-2"
+                >
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
                     <div className="flex items-center gap-2">
                       <Terminal className="w-4 h-4 text-green-400" />
@@ -521,7 +527,7 @@ const InterviewPage = () => {
                     rows={6}
                     onKeyDown={onKeyDown}
                     spellCheck={false}
-                    className="w-full bg-[#0d1117] text-[#e6edf3] border border-white/10 rounded-lg p-4 text-sm font-mono resize-none focus:outline-none focus:ring-1 focus:ring-green-500/50 disabled:opacity-50 transition-all custom-scrollbar"
+                    className="w-full bg-[#0d1117] text-[#e6edf3] border border-white/10 rounded-lg p-4 text-sm font-mono resize-none focus:outline-none focus:ring-1 focus:ring-green-500/50 disabled:opacity-50 transition-all"
                   />
                 </motion.div>
               )}
@@ -531,7 +537,9 @@ const InterviewPage = () => {
                   <textarea
                     value={userInput}
                     onChange={(e) => setUserInput(e.target.value)}
-                    placeholder={isDSA ? "Explain your approach here (optional)..." : "Type your answer here… (Press Enter to send)"}
+                    placeholder={isDSA
+                      ? "Explain your approach here (optional)..."
+                      : "Type your answer here… (Press Enter to send)"}
                     disabled={isLoading}
                     rows={2}
                     onKeyDown={onKeyDown}
@@ -568,13 +576,6 @@ const InterviewPage = () => {
                     whileTap={{ scale: 0.9 }}
                     onClick={toggleRecording}
                     disabled={isLoading}
-                    title={
-                      !isSupported()
-                        ? "Not supported — type instead"
-                        : isRecording
-                          ? "Stop recording (then send)"
-                          : "Start recording"
-                    }
                     className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all shrink-0 ${
                       isRecording
                         ? "bg-destructive text-destructive-foreground mic-pulse"
@@ -603,7 +604,9 @@ const InterviewPage = () => {
               <AnimatePresence>
                 {isRecording && (mode === "voice" || mode === "video") && (
                   <motion.div
-                    initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
                     className="glass rounded-lg p-2 flex items-center gap-2 overflow-hidden"
                   >
                     <div className="recording-dot" />
@@ -621,7 +624,6 @@ const InterviewPage = () => {
                   </motion.div>
                 )}
               </AnimatePresence>
-
             </div>
           )}
         </div>
@@ -642,7 +644,6 @@ const InterviewPage = () => {
             </div>
           </div>
         )}
-
       </div>
     </div>
   );
@@ -675,3 +676,4 @@ const ChatBubble = ({ message }: { message: ChatMessage }) => {
 };
 
 export default InterviewPage;
+

@@ -1,0 +1,128 @@
+[
+  {
+    "question": "You mentioned you have experience with various programming languages, but can you walk me through a real-world project where you applied object-oriented principles in Python to solve a complex problem?",
+    "answer": "Inspector Office ke project I have implemented op of python",
+    "analysis": {
+      "clarity": 4,
+      "confidence": 5,
+      "technical": 6,
+      "overall": 5.0
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Can you explain how the relational database design for the student elective course relationship would change if you were to integrate additional student attributes, such as 'address' into the database?",
+    "answer": "it should be RDBMS",
+    "analysis": {
+      "clarity": 8,
+      "confidence": 7,
+      "technical": 3,
+      "overall": 6.0
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Considering the speed benefits of UDP, how would you design a mechanism to ensure a reliable DNS resolution, especially in cases where a DNS request is partially delivered?",
+    "answer": "udp is better and DNS  is not",
+    "analysis": {
+      "clarity": 3,
+      "confidence": 4,
+      "technical": 1,
+      "overall": 2.67
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.4404
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "In a distributed database scenario, consider two nodes are accessing and updating the same data concurrently, how would you ensure data consistency and prevent the described issue with redundancy and duplicates?",
+    "answer": "```\nimplement cure data structure in this as if one not finishes then other node will start the process\n```",
+    "analysis": {
+      "clarity": 4,
+      "confidence": 6,
+      "technical": 8,
+      "overall": 6.0
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": 0.0
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "Here's your interview question - \n\nGiven two linked lists, how would you merge them in-order while avoiding any duplicate merges from happening. You'll have to write the merge function that handles this. \nWhat would be your time and space complexity for this solution.",
+    "answer": "```\nFUNCTION mergeUniqueSortedLists(list1, list2):\n    // Create a dummy node to simplify edge cases (like an empty list)\n    dummy = New Node(0)\n    current = dummy\n\n    WHILE list1 is NOT null AND list2 is NOT null:\n        // Determine which node has the smaller value\n        IF list1.value < list2.value:\n            chosenNode = list1\n            list1 = list1.next\n        ELSE IF list2.value < list1.value:\n            chosenNode = list2\n            list2 = list2.next\n        ELSE:\n            // Values are equal, pick one and advance BOTH to skip the duplicate\n            chosenNode = list1\n            list1 = list1.next\n            list2 = list2.next\n\n        // Only attach the node if it's not a duplicate of the last added node\n        IF chosenNode.value != current.value OR current == dummy:\n            current.next = chosenNode\n            current = current.next\n            current.next = null // Terminate pointer to avoid cycles\n\n    // Handle remaining elements in list1 or list2\n    remaining = (list1 != null) ? list1 : list2\n    \n    WHILE remaining is NOT null:\n        IF remaining.value != current.value:\n            current.next = remaining\n            current = current.next\n            remaining = remaining.next\n            current.next = null\n        ELSE:\n            remaining = remaining.next\n\n    RETURN dummy.next\n\nTime Complexity: $O(n + m)$\nSpace Complexity: $O(1)$\n```",
+    "analysis": {
+      "clarity": 9,
+      "confidence": 8,
+      "technical": 9,
+      "overall": 8.67
+    },
+    "sentiment": {
+      "tone": "confident",
+      "score": 0.7633
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  },
+  {
+    "question": "We're given an array of integers where each pair of two elements is distinct, and every pair appears exactly once in the array with a constraint that if the pair (A, B) is present, then the pair (B, A) is not.\n\nImplement a data structure that supports add, remove, query operations for pairs in this array in O(1) time complexity for each operation.\n\nCan you do it? \nNote - Please ask for time and space complexity at the end. \nAlso please return a method name you would use for this. \n\n(Note: You can use python or any other language to solve it during the interview.)",
+    "answer": "```\nclass UniquePairManager:\n    def __init__(self):\n        # Using a set for O(1) average time complexity\n        self.pairs = set()\n\n    def _normalize(self, a, b):\n        \"\"\"Helper to ensure (A, B) and (B, A) are treated as the same.\"\"\"\n        return (a, b) if a < b else (b, a)\n\n    def add_pair(self, a, b):\n        normalized = self._normalize(a, b)\n        self.pairs.add(normalized)\n\n    def remove_pair(self, a, b):\n        normalized = self._normalize(a, b)\n        # Using discard to avoid errors if the pair doesn't exist\n        self.pairs.discard(normalized)\n\n    def query_pair(self, a, b):\n        normalized = self._normalize(a, b)\n        return normalized in self.pairs\n\nTime Complexity: * Add: $O(1)$\npace Complexity: * $O(N)$\n```",
+    "analysis": {
+      "clarity": 8,
+      "confidence": 7,
+      "technical": 6,
+      "overall": 7.0
+    },
+    "sentiment": {
+      "tone": "neutral",
+      "score": -0.1531
+    },
+    "environment": {
+      "faces_detected": 1,
+      "background_voice": false,
+      "voice_level": 0,
+      "warnings": [],
+      "final_flags": []
+    }
+  }
+]

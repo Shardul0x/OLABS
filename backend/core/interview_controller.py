@@ -5,6 +5,7 @@ from utils.session_history import save_interaction, load_history
 from core.llm_report import generate_llm_report
 from utils.session_db import save_final_report
 
+
 class InterviewController:
     def __init__(self, session_id):
         self.session_id = session_id
@@ -27,15 +28,17 @@ class InterviewController:
     def next_question(self, previous_answer=None):
         if self.step >= self.max_steps:
             history = load_history(self.session_id)
-
-            # limit logs (cost control)
-            history = history[-6:]
+            history = history[-6:]  # limit logs for cost control
 
             report = generate_llm_report(history)
-
             save_final_report(self.session_id, report)
 
-            return "Interview complete.", report
+            # ✅ Return structured dict instead of bare tuple
+            return {
+                "is_complete": True,
+                "next_question": "Interview complete.",
+                "report": report
+            }
 
         question_type = self.stages[self.step]
 
@@ -49,24 +52,35 @@ class InterviewController:
         self.current_question = question
         self.step += 1
 
-        return question
+        # ✅ Always return structured dict
+        return {
+            "is_complete": False,
+            "next_question": question,
+            "report": None
+        }
 
     # ----------------------------
     # PROCESS ANSWER
     # ----------------------------
     def process_answer(self, answer, input_data=None):
         if self.current_question is None:
-            return "No active question."
+            return {
+                "next_question": None,
+                "analysis": {},
+                "sentiment": {},
+                "environment": {},
+                "error": "No active question."
+            }
 
         if input_data is None:
             input_data = {}
 
-        faces = input_data.get("faces_detected", 1)
+        faces            = input_data.get("faces_detected", 1)
         background_voice = input_data.get("background_voice", False)
-        voice_level = input_data.get("voice_level", 0)
+        voice_level      = input_data.get("voice_level", 0)
 
         # ANALYSIS
-        analysis = analyze_answer(answer)
+        analysis  = analyze_answer(answer)
         sentiment = analyze_sentiment(answer)
 
         history = load_history(self.session_id)
@@ -75,12 +89,11 @@ class InterviewController:
         face_count = sum(
             1 for h in history if h.get("environment", {}).get("faces_detected", 0) > 1
         )
-
         voice_count = sum(
             1 for h in history if h.get("environment", {}).get("background_voice", False)
         )
 
-        warnings = []
+        warnings    = []
         final_flags = []
 
         # ----------------------------
@@ -90,7 +103,6 @@ class InterviewController:
             h.get("environment", {}).get("faces_detected", 1)
             for h in history[-3:]
         ]
-
         stable_faces = max([faces] + recent_faces)
 
         if stable_faces > 1 and recent_faces.count(1) < 2:
@@ -125,11 +137,11 @@ class InterviewController:
         )
 
         environment = {
-            "faces_detected": faces,
+            "faces_detected":   faces,
             "background_voice": background_voice,
-            "voice_level": voice_level,
-            "warnings": warnings,
-            "final_flags": final_flags
+            "voice_level":      voice_level,
+            "warnings":         warnings,
+            "final_flags":      final_flags
         }
 
         # SAVE
@@ -145,13 +157,16 @@ class InterviewController:
         print("\n--- ENVIRONMENT ---")
         print(environment)
 
-        next_q = self.next_question(previous_answer=answer)
+        # ✅ next_question() always returns a dict now
+        next_result = self.next_question(previous_answer=answer)
 
         return {
-            "next_question": next_q,
-            "analysis": analysis,
-            "sentiment": sentiment,
-            "environment": environment
+            "next_question": next_result["next_question"],
+            "is_complete":   next_result["is_complete"],
+            "report":        next_result.get("report"),
+            "analysis":      analysis,
+            "sentiment":     sentiment,
+            "environment":   environment
         }
 
     # ----------------------------
